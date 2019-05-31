@@ -1,0 +1,81 @@
+version: '2'
+
+networks:
+    etcd-network:
+        driver: bridge
+services:
+    etcd1:
+        image: quay.io/coreos/etcd:latest
+        restart: always
+        ports:
+             - 23791:2379
+             - 23801:2380
+        volumes:
+          - ${ETCD_DATA}:/etcd1-data
+        environment:
+            ETCD_NAME: etcd1
+            ETCD_DATA_DIR: /etcd1-data/etcd1.etcd
+            ETCDCTL_API: 3
+            ETCD_INITIAL_ADVERTISE_PEER_URLS: http://etcd1:23801
+            ETCD_INITIAL_CLUSTER: etcd1=http://etcd1:23801,etcd2=http://etcd2:23802,etcd3=http://etcd3:23803
+            ETCD_INITIAL_CLUSTER_STATE: new
+            ETCD_INITIAL_CLUSTER_TOKEN: etcd-ftw
+            ETCD_LISTEN_CLIENT_URLS: http://0.0.0.0:23791,http://127.0.0.1:2379
+            ETCD_LISTEN_PEER_URLS: http://0.0.0.0:23801
+            ETCD_ADVERTISE_CLIENT_URLS: http://etcd1:23791
+        networks:
+          - etcd-network
+
+    etcd2:
+        image: quay.io/coreos/etcd:latest
+        restart: always
+        ports:
+             - 23792:2379
+             - 23802:2380
+        volumes:
+          - ${ETCD_DATA}:/etcd2-data
+        environment:
+            ETCD_NAME: etcd2
+            ETCD_DATA_DIR: /etcd2-data/etcd2.etcd
+            ETCDCTL_API: 3
+            ETCD_INITIAL_ADVERTISE_PEER_URLS: http://etcd2:23802
+            ETCD_INITIAL_CLUSTER: etcd1=http://etcd1:23801,etcd2=http://etcd2:23802,etcd3=http://etcd3:23803
+            ETCD_INITIAL_CLUSTER_STATE: new
+            ETCD_INITIAL_CLUSTER_TOKEN: etcd-ftw
+            ETCD_LISTEN_CLIENT_URLS: http://0.0.0.0:23792,http://127.0.0.1:2379
+            ETCD_LISTEN_PEER_URLS: http://0.0.0.0:23802
+            ETCD_ADVERTISE_CLIENT_URLS: http://etcd2:23792
+        networks:
+          - etcd-network
+
+    etcd3:
+        image: quay.io/coreos/etcd:latest
+        restart: always
+        ports:
+             - 23793:2379
+             - 23803:2380
+        volumes:
+          - ${ETCD_DATA}:/etcd3-data
+        environment:
+            ETCD_NAME: etcd3
+            ETCD_DATA_DIR: /etcd3-data/etcd3.etcd
+            ETCDCTL_API: 3
+            ETCD_INITIAL_ADVERTISE_PEER_URLS: http://etcd3:23803
+            ETCD_INITIAL_CLUSTER: etcd1=http://etcd1:23801,etcd2=http://etcd2:23802,etcd3=http://etcd3:23803
+            ETCD_INITIAL_CLUSTER_STATE: new
+            ETCD_INITIAL_CLUSTER_TOKEN: etcd-ftw
+            ETCD_LISTEN_CLIENT_URLS: http://0.0.0.0:23793,http://127.0.0.1:2379
+            ETCD_LISTEN_PEER_URLS: http://0.0.0.0:23803
+            ETCD_ADVERTISE_CLIENT_URLS: http://etcd3:23793
+        networks:
+          - etcd-network
+
+
+
+
+
+
+
+
+
+
