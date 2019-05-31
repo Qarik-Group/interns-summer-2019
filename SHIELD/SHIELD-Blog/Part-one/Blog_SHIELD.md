@@ -1,5 +1,5 @@
-##SHIELD: Getting up and running via Docker
-###By: Naveed Ahmad & Pururva Lakkad
+##SHIELD: Getting up and running via Docker<br/>
+###By: Naveed Ahmad & Pururva Lakkad<br/>
 
 We are interning here at Stark & Wayne for the summer. As mentioned earlier at the blog, we had to choose one project out of the four amazing ones. As a team, we’ve decided to work on building SHIELD etcd Data protection plugin. This project has a lot of bits and pieces, which we are trying to figure out;one thing at a time. The first part was to figure out how SHIELD works. We have worked on getting SHIELD up and running via Docker compose. This is the easiest and most convenient way to get started with SHIELD. 
 
