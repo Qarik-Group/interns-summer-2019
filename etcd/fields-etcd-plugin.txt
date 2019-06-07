@@ -1,0 +1,3 @@
+Flags required for the plugin:
+    endpoint/endpoints
+    user authentication
