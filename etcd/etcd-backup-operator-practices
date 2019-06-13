@@ -1,0 +1,10 @@
+Operator practices for backing up etcd 
+
+etcd can be backed up in one of the following ways:
+
+1. Using etcd go SDK [etcd: go.etcd.io/etcd/clientv3]
+2. Old fashioned: Logging in to one of the cluster members, preferably the master/leader and backing up member/snap folder. (https://docs.docker.com/engine/reference/commandline/exec/)
+3. `etcdctl snapshot save` (https://github.com/etcd-io/etcd/blob/master/Documentation/op-guide/recovery.md)
+4. Using Velero (https://github.com/heptio/velero)
+5. etcd operator (https://github.com/coreos/etcd-operator) 
+
