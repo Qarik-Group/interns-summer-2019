@@ -1,0 +1,316 @@
+#!/bin/bash
+#vim:ft=bash
+set -e -o pipefail
+
+targetdir=tmp/data
+storedir=tmp/store
+mkdir -p $targetdir
+echo "this is an important file, dated $(date)" > $targetdir/important
+
+
+cd "$(dirname "${BASH_SOURCE[0]}")"
+export PORT=$1
+export WEBDAV_PORT=$(( PORT + 1 ))
+NO_INIT=${2:-}
+
+if [[ ! -f "../shield" ]]; then pushd .. && go build ./cmd/shield ; popd; fi
+
+shield() { ../shield "$@"; }
+indent2() { sed -e 's/^/  /'; }
+indent4() { sed -e 's/^/    /'; }
+
+echo "waiting for SHIELD Core to spin up on http://127.0.0.1:8180..."
+while ! curl -Ls --fail http://127.0.0.1:8180/v2/info 2>/dev/null | grep -q TESTDEV; do
+  sleep 1
+done
+
+echo targetdir=$targetdir
+echo storedir=$storedir
+
+# this agent is not real, but the data validation
+# requires that we provide an agent host:port...
+SHIELD_AGENT_ADDR="127.0.0.1:5444"
+
+export SHIELD_CORE=localdev
+export SHIELD_BATCH_MODE=y
+
+if [[ -n "${NO_INIT:-}" ]]; then
+  echo ; echo "Skipping dev SHIELD core initialization (NO_INIT=$NO_INIT)..."
+  exit 0
+fi
+
+echo ; echo "Initializing this dev SHIELD core"
+shield api localdev http://localhost:8180
+SHIELD_CORE_MASTER="master-password-yo" shield initialize >.init || true
+echo ; echo "Logging in as the failsafe user"
+shield login --username failsafe --password sekrit 2>&1 | indent2
+shield id 2>&1 | indent2
+
+
+SHIELD_DATA_SET="${SHIELD_DATA_SET:-dev}"
+if [[ "$SHIELD_DATA_SET" == "dev" ]]; then # {{{
+  echo ; echo "  - Setting up admin account"
+  shield create-user \
+            --name        Administrator \
+            --username    admin \
+            --password    password \
+            --system-role admin \
+    2>&1 | indent4
+  echo ; echo "  - Setting up engineer account"
+  shield create-user \
+            --name        Engineer \
+            --username    engineer \
+            --password    engineer \
+            --system-role engineer \
+    2>&1 | indent4
+
+  echo ; echo "  - Logging in as admin:password"
+  shield login --username admin --password password 2>&1 | indent4
+  shield id 2>&1 | indent4
+
+  echo ; echo "Setting up Global Resources"
+         echo "  - creating Globus global cloud storage system"
+  shield create-global-store \
+            --name    Globus \
+            --summary 'Global Storage, for use by any and all' \
+            --agent   "${SHIELD_AGENT_ADDR}" \
+            --plugin  webdav \
+            --data    "url=http://localhost:${WEBDAV_PORT}" \
+    2>&1 | indent2
+
+  echo ; echo "Setting up 'Acme, Inc.' tenant"
+  shield create-tenant \
+            --name 'Acme, Inc.' \
+    2>&1 | indent2
+
+  echo ; echo "  - creating user rrunner:password"
+  shield create-user \
+            --name     'Road Runner' \
+            --username rrunner \
+            --password password \
+    2>&1 | indent4
+
+  echo ; echo "  - creating user wcoyote:password"
+  shield create-user \
+            --name     'Wile E. Coyote' \
+            --username wcoyote \
+            --password password \
+    2>&1 | indent4
+
+  echo ; echo "  - creating user cjones:password"
+  shield create-user \
+            --name     'Chuck Jones' \
+            --username cjones \
+            --password password \
+    2>&1 | indent4
+
+  echo ; echo "  - inviting cjones to Acme, Inc. as an operator"
+  shield invite --tenant Acme --role operator cjones  2>&1 | indent4
+  echo ; echo "  - inviting wcoyote to Acme, Inc. as an engineer"
+  shield invite --tenant Acme --role engineer wcoyote 2>&1 | indent4
+  echo ; echo "  - inviting rrunner to Acme, Inc. as an admin"
+  shield invite --tenant Acme --role admin    rrunner 2>&1 | indent4
+
+  echo
+  shield tenant --json Acme 2>&1 | indent2
+
+
+  echo ; echo "Setting up 'Other Tenant' tenant"
+         echo "  - creating tenant 'Other Tenant'"
+  shield create-tenant \
+            --name 'Other Tenant' \
+    2>&1 | indent4
+
+  echo ; echo "  - inviting all of Acme, Inc. members to Other Tenant as operators"
+  shield invite --tenant Other --role operator cjones wcoyote rrunner 2>&1 | indent4
+  echo ; echo "  - inviting admin to Other Tenant as an admin"
+  shield invite --tenant Other --role admin admin 2>&1 | indent4
+
+
+
+  export SHIELD_TENANT=Acme
+  echo ; echo "Populating 'Acme, Inc.' tenant with targets, stores, policies, etc."
+         echo "  - loggin in as rrunner:password"
+  shield login --username rrunner --password password 2>&1 | indent4
+  shield id 2>&1 | indent4
+
+  echo ; echo "  - creating 'S3' cloud storage system"
+  shield create-store \
+          --name    S3 \
+          --summary 'A fake S3 store for pretending and web UI development.' \
+          --agent   "${SHIELD_AGENT_ADDR}" \
+          --plugin  webdav \
+          --data    "url=http://localhost:${WEBDAV_PORT}/s3" \
+    2>&1 | indent4
+
+  echo ; echo "  - creating 'Scality (On-Prem)' cloud storage system"
+  shield create-store \
+          --name    'Scality (On-Prem)' \
+          --summary 'A fake Scality (On-Premise) store for pretending and web UI development.' \
+          --agent   "${SHIELD_AGENT_ADDR}" \
+          --plugin  webdav \
+          --data    "url=http://localhost:${WEBDAV_PORT}/s3"
+    2>&1 | indent4
+
+  export SHIELD_TRACE=y
+  for i in $(seq 1 5); do
+    echo "  - creating 'System #427/a0${i}' target data system"
+    shield create-target \
+              --name    "System #427/a0${i}" \
+              --summary 'A test system for generating lots of web UI output and pushing the limits of the web UI.' \
+              --agent   "${SHIELD_AGENT_ADDR}" \
+              --plugin  fs \
+              --data    "base_dir=${targetdir}" \
+              --data    bsdtar=bsdtar \
+              --data    'exclude=var/*.db' \
+      2>&1 | indent4
+
+  done
+
+  echo ; echo "  - creating Weekly job for 'System #427/a01'"
+  shield create-job \
+          --name FAST \
+          --schedule 'every minute' \
+          --paused \
+          --store    s3 \
+          --target   "System #427/a01" \
+          --retain   1d  \
+    2>&1 | indent4
+
+  echo ; echo "  - creating Weekly job for 'System #427/a02'"
+  shield create-job \
+          --name Weekly \
+          --schedule 'sundays at 2:45am' \
+          --paused \
+          --store    s3 \
+          --target   "System #427/a02" \
+          --retain   14d \
+    2>&1 | indent4
+
+  echo ; echo "  - creating Weekly job for 'System #427/a03'"
+  shield create-job \
+          --name Weekly \
+          --schedule 'sundays at 3am' \
+          --paused \
+          --store    s3 \
+          --target   "System #427/a03" \
+          --retain   14d \
+    2>&1 | indent4
+
+  echo ; echo "  - creating Daily job for 'System #427/a02'"
+  shield create-job \
+          --name     Daily \
+          --schedule 'daily 4:10am' \
+          --paused \
+          --store    s3 \
+          --target   "System #427/a02" \
+          --retain   1d \
+    2>&1 | indent4
+
+  echo ; echo "  - creating Daily job for 'System #427/a03'"
+  shield create-job \
+          --name     Daily \
+          --schedule 'daily 4:20am' \
+          --paused \
+          --store    s3 \
+          --target   "System #427/a03" \
+          --retain   1d \
+    2>&1 | indent4
+
+  echo ; echo "  - creating Daily job for 'System #427/a04'"
+  shield create-job \
+          --name     Daily \
+          --schedule 'daily 4:30am' \
+          --paused \
+          --store    s3 \
+          --target   "System #427/a04" \
+          --retain   1d \
+    2>&1 | indent4
+
+  echo ; echo "  - creating Daily job for 'System #427/a05'"
+  shield create-job \
+          --name     Daily \
+          --schedule 'daily 4:40am' \
+          --paused \
+          --store    s3 \
+          --target   "System #427/a05" \
+          --retain   1d \
+    2>&1 | indent4
+
+
+  export SHIELD_TENANT=Other
+  echo ; echo "Populating 'Other Tenant' tenant with targets, stores, etc."
+         echo "  - loggin in as admin:password"
+  shield login --username admin --password password 2>&1 | indent4
+  shield id 2>&1 | indent4
+
+  echo ; echo "  - creating 'CloudStor' cloud storage system"
+  shield create-store \
+          --name    CloudStor \
+          --summary 'A temporary store for the dev environment.' \
+          --agent   "${SHIELD_AGENT_ADDR}" \
+          --plugin  webdav \
+          --data    "url=http://localhost:${WEBDAV_PORT}"
+    2>&1 | indent4
+
+  echo ; echo "  - creating 'SHIELD' data system target"
+  shield create-target \
+          --name    SHIELD \
+          --summary 'The working directory of the dev environment.' \
+          --agent   "${SHIELD_AGENT_ADDR}" \
+          --plugin  fs \
+          --data    "base_dir=${targetdir}" \
+          --data    bsdtar=bsdtar \
+          --data    'exclude=var/*.db' \
+    2>&1 | indent4
+
+  echo ; echo "  - creating Hourly job for SHIELD backups"
+  shield create-job \
+          --name     'Hourly' \
+          --paused \
+          --schedule 'hourly at :05' \
+          --target   SHIELD \
+          --store    CloudStor \
+          --retain   2d \
+          --fixed-key \
+    2>&1 | indent4
+
+
+  echo ; echo "Running Jobs in 'Other Tenant' tenant"
+         echo "  - running SHIELD job (should succeed)"
+  shield run-job Hourly 2>&1 | indent4
+  sleep 2
+
+  echo ; echo "  - running Hourly job again (should succeed)"
+  shield run-job Hourly
+  shield run-job Hourly 2>&1 | indent4
+  sleep 2
+
+  echo ; echo "  - modifying Hourly target configuration to induce failure"
+  shield update-target SHIELD \
+            --data base_dir=/e/no/ent \
+    2>&1 | indent4
+  echo ; echo "  - running Hourly job again (should start failing)"
+  shield run-job Hourly 2>&1 | indent4
+  sleep 3
+
+  echo ; echo "  - running Hourly job again (should still fail)"
+  shield run-job Hourly 2>&1 | indent4
+  sleep 3
+# }}}
+elif [[ "$SHIELD_DATA_SET" == "minimal" ]]; then
+  echo ; echo "  - Setting up admin account"
+  shield create-user \
+            --name        Administrator \
+            --username    admin \
+            --password    password \
+            --system-role admin \
+    2>&1 | indent4
+
+  echo ; echo "  - Logging in as admin:password"
+  shield login --username admin --password password 2>&1 | indent4
+  shield id 2>&1 | indent4
+fi
+
+echo ; echo
+echo ; echo "DONE"

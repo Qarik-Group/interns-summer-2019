@@ -1,0 +1,37 @@
+---
+#
+# THIS IS AN EXAMPLE import file to demonstrate the
+# syntax used for a shield import.
+#
+
+# Local Users can be defined:
+users:
+  - name:     Administrator
+    username: admin
+    password: password
+    sysrole:  admin
+tenants:
+  - name: A Tenant
+    members:
+      - { user: srini@local, role: admin }
+
+    storage:
+      - name:    Local Storage
+        summary: Dedicated cloud storage, just for this tenant.
+        agent:   '10.0.0.6:5444'
+        plugin:  webdav
+        config:
+          url: http://webdav/a-tenant
+
+    systems:
+      - name:    A System
+        summary: A protected data system, owned by A Tenant.
+        agent:   10.255.6.7:5444
+        plugin:  etcd
+
+        jobs:
+          - name:     Daily
+            when:     daily 4:10am
+            paused:   no
+            storage:  Local Storage
+            retain:   4d

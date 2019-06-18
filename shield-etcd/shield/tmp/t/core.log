@@ -1,0 +1,71 @@
+>> Setting up SHIELD schema
+2019-06-17 12:54:34.179857000 -400 EDT ./shield-schema: INFO:  deployed schema version 8
+
+>> RUNNING SHIELDD
+
+>> WAITING FOR SHIELD CORE TO COME ONLINE
+2019-06-17 12:54:34.199855000 -400 EDT ./shieldd: INFO:  starting up shield core
+2019-06-17 12:54:34.201584000 -400 EDT ./shieldd: INFO:  INITIALIZING: connecting to the database...
+2019-06-17 12:54:34.201631000 -400 EDT ./shieldd: DEBUG: connecting to database at /Users/srini/go/src/github.com/starkandwayne/shield/tmp/t/var//shield.db...
+2019-06-17 12:54:34.201689000 -400 EDT ./shieldd: INFO:  INITIALIZING: checking database schema...
+2019-06-17 12:54:34.203062000 -400 EDT ./shieldd: DEBUG: connected successfully to database!
+2019-06-17 12:54:34.203463000 -400 EDT ./shieldd: INFO:  INITIALIZING: configuring message bus...
+2019-06-17 12:54:34.203509000 -400 EDT ./shieldd: INFO:  INITIALIZING: wiring up authentication providers...
+2019-06-17 12:54:34.203530000 -400 EDT ./shieldd: INFO:  INITIALIZING: creating the SHIELD (local auth) failsafe user...
+2019-06-17 12:54:34.203549000 -400 EDT ./shieldd: DEBUG: checking to see if we should re-instate the 'initio' failsafe account
+2019-06-17 12:54:34.203645000 -400 EDT ./shieldd: DEBUG: creating failsafe account 'initio'
+2019-06-17 12:54:35.462245000 -400 EDT ./shieldd: DEBUG: adding failsafe account to 'Default Tenant' as an admin
+2019-06-17 12:54:35.464928000 -400 EDT ./shieldd: INFO:  INITIALIZING: populating SHIELD tenants referenced in auth providers...
+2019-06-17 12:54:35.464982000 -400 EDT ./shieldd: INFO:  INITIALIZING: cleaning up leftover task records...
+2019-06-17 12:54:35.465322000 -400 EDT ./shieldd: INFO:  INITIALIZING: connecting to the local SHIELD vault...
+2019-06-17 12:54:35.467875000 -400 EDT ./shieldd: ERROR: SHIELD's vault is uninitialized; please initialize or unlock this SHIELD core via the web UI or the CLI
+2019-06-17 12:54:35.467910000 -400 EDT ./shieldd: INFO:  INITIALIZING: binding the SHIELD Core API/UI on 127.0.0.1:8282...
+2019-06-17 12:54:35.467930000 -400 EDT ./shieldd: INFO:  INITIALIZING: serving SHIELD Web UI static assets from ./web/htdocs...
+2019-06-17 12:54:35.469435000 -400 EDT ./shieldd: INFO:  INITIALIZING: starting up the scheduler...
+2019-06-17 12:54:35.469482000 -400 EDT ./shieldd: INFO:  INITIALIZATION COMPLETE; entering main loop.
+{"api":2,"ip":"10.0.2.38","env":"SHIELD","color":"yellow"}
+>> INITIALIZING SHIELD CORE
+2019-06-17 12:54:36.273654000 -400 EDT ./shieldd: INFO:  POST /v2/init: initializing the SHIELD Core...
+{"response":"Successfully initialized the SHIELD Core","fixed_key":"ff51455571780b25d1c86a1d7cd57d5fa05982d85818a4bcad9425633530d6274558426d43d8aeaf1b3510af7a9b352b8581a8433895e45bea4b068406c1a69ee2a6d357071c9f8b02279420b454ca57895be3bd650a1c942cb82040fc8a46a2530662900ade966819e3b8fe9160f61ccad9d67b6649975e62bbdf85da1c588e2cfdbb85e40f7d00a9d21552e574d564417bea7f56a5281685cb8ee503c8ed802efcbfb7a8c660ed67bd62b25e18b15abf1e90386be784f91e975229ba4a00a83730893d130ab29ae1c4f8edf15ebd4642f528942718a35b0665c3646ae365bb72a1af8b65f5c0dc2900e33e2ae39e8bae48d07c7f8a27f5d350ca2162ca690434dc584eb6ac81383c4696972d4c5e3e34d1faea8063bb51b57faa1f78852750e309f73e4bab966829f5a3f33f973a8e25cf25b848bfe5abe2240a6e8c3c368301c8b269f950b012e13a456637c94a01afedeede14cb99f01c1aba2ce11a0f16ac34a0b8e5b45073de8cb3f23bc63482f3a2842d3bbaad2bac1589688ebe48042d8a4f9eb8c0584e221619aa4e94f576336c8f660384aeaecc8193317d90fcccbb00a191eb7cd9b58d16b81f4801f80dde6f06f6e6e5d0acfbded43741962f3c1830fca545f9a7835aa10344204a49c9be82a589149146a9f068fac55058a1d89bdd8cac35affba3b73449198265d25636d9c21708733cceb1bf610f68384caf"}
+>> UNLOCKING SHIELD CORE
+{"ok":"Successfully unlocked the SHIELD Core"}
+2019-06-17 12:54:36.499117000 -400 EDT ./shieldd: INFO:  sending create-object to [*] for agent [2dc90b4c-e278-42a8-ad8b-bd35fc3bd84e]
+2019-06-17 12:54:44.962728000 -400 EDT ./shieldd: INFO:  sending create-object to [tenant:14cae941-060e-4aae-befb-26ce1c8df2b1] for target [1945ff53-7879-4fc8-886d-1037adc02e1a]
+2019-06-17 12:54:45.000371000 -400 EDT ./shieldd: INFO:  sending create-object to [tenant:14cae941-060e-4aae-befb-26ce1c8df2b1] for target [ebfe6fe2-c508-4469-836e-273c8200fe40]
+2019-06-17 12:54:45.032360000 -400 EDT ./shieldd: INFO:  sending create-object to [tenant:14cae941-060e-4aae-befb-26ce1c8df2b1] for target [a369ae1e-457f-450c-98eb-cd5298a1b2a2]
+2019-06-17 12:54:45.069620000 -400 EDT ./shieldd: INFO:  sending create-object to [tenant:14cae941-060e-4aae-befb-26ce1c8df2b1] for store [742652e1-94c8-4cd7-9d1f-c32f88e10cc0]
+2019-06-17 12:54:45.072856000 -400 EDT ./shieldd: INFO:  sending create-object to [tenant:14cae941-060e-4aae-befb-26ce1c8df2b1] for task [61da4a25-2b37-4a15-ab7c-61de83abec48]
+2019-06-17 12:54:45.111906000 -400 EDT ./shieldd: INFO:  sending create-object to [tenant:14cae941-060e-4aae-befb-26ce1c8df2b1] for store [0506d203-641b-4ca2-9472-384cb80e66ce]
+2019-06-17 12:54:45.115802000 -400 EDT ./shieldd: INFO:  sending create-object to [tenant:14cae941-060e-4aae-befb-26ce1c8df2b1] for task [80814cf4-ddc0-4144-8ed3-17896c3d29b3]
+2019-06-17 12:54:45.151330000 -400 EDT ./shieldd: INFO:  sending create-object to [tenant:14cae941-060e-4aae-befb-26ce1c8df2b1] for store [3404a97d-dbdb-475f-baf0-22aaa51d06df]
+2019-06-17 12:54:45.154453000 -400 EDT ./shieldd: INFO:  sending create-object to [tenant:14cae941-060e-4aae-befb-26ce1c8df2b1] for task [b8cb0f6d-8a7e-466f-a929-77ca005b75d9]
+2019-06-17 12:54:45.203727000 -400 EDT ./shieldd: INFO:  sending create-object to [tenant:14cae941-060e-4aae-befb-26ce1c8df2b1] for job [8373b80b-b6fc-4c1b-baee-1face5060372]
+2019-06-17 12:54:45.257737000 -400 EDT ./shieldd: INFO:  sending create-object to [tenant:14cae941-060e-4aae-befb-26ce1c8df2b1] for job [e9709acb-9fca-4845-8f02-baced9e155d9]
+2019-06-17 12:54:45.763690000 -400 EDT ./shieldd: INFO:  sending update-object to [tenant:32520983-45b4-43ea-9bad-747475a5e4c8] for tenant [32520983-45b4-43ea-9bad-747475a5e4c8]
+2019-06-17 12:54:56.534417000 -400 EDT ./shieldd: INFO:  sending create-object to [tenant:14cae941-060e-4aae-befb-26ce1c8df2b1] for target [b4b2dd7c-8155-49e7-b53a-3332c1f7cbfd]
+2019-06-17 12:54:56.663519000 -400 EDT ./shieldd: INFO:  sending update-object to [tenant:14cae941-060e-4aae-befb-26ce1c8df2b1] for target [b4b2dd7c-8155-49e7-b53a-3332c1f7cbfd]
+2019-06-17 12:54:56.783539000 -400 EDT ./shieldd: INFO:  sending update-object to [tenant:14cae941-060e-4aae-befb-26ce1c8df2b1] for target [b4b2dd7c-8155-49e7-b53a-3332c1f7cbfd]
+2019-06-17 12:54:56.902302000 -400 EDT ./shieldd: INFO:  sending update-object to [tenant:14cae941-060e-4aae-befb-26ce1c8df2b1] for target [b4b2dd7c-8155-49e7-b53a-3332c1f7cbfd]
+2019-06-17 12:54:57.027785000 -400 EDT ./shieldd: INFO:  sending update-object to [tenant:14cae941-060e-4aae-befb-26ce1c8df2b1] for target [b4b2dd7c-8155-49e7-b53a-3332c1f7cbfd]
+2019-06-17 12:54:57.273004000 -400 EDT ./shieldd: INFO:  sending delete-object to [tenant:14cae941-060e-4aae-befb-26ce1c8df2b1] for target [b4b2dd7c-8155-49e7-b53a-3332c1f7cbfd]
+2019-06-17 12:54:58.527175000 -400 EDT ./shieldd: INFO:  sending create-object to [tenant:14cae941-060e-4aae-befb-26ce1c8df2b1] for store [66e10c9f-a9f1-4286-8c9e-208bc1065aa4]
+2019-06-17 12:54:58.531648000 -400 EDT ./shieldd: INFO:  sending create-object to [tenant:14cae941-060e-4aae-befb-26ce1c8df2b1] for task [849d91ca-98c4-40bb-aa76-ac2984b3402a]
+2019-06-17 12:54:58.648798000 -400 EDT ./shieldd: INFO:  sending update-object to [tenant:14cae941-060e-4aae-befb-26ce1c8df2b1] for store [66e10c9f-a9f1-4286-8c9e-208bc1065aa4]
+2019-06-17 12:54:58.652160000 -400 EDT ./shieldd: INFO:  sending create-object to [tenant:14cae941-060e-4aae-befb-26ce1c8df2b1] for task [e64dbba2-36c8-44e8-a890-ce974cfc69b9]
+2019-06-17 12:54:58.770172000 -400 EDT ./shieldd: INFO:  sending update-object to [tenant:14cae941-060e-4aae-befb-26ce1c8df2b1] for store [66e10c9f-a9f1-4286-8c9e-208bc1065aa4]
+2019-06-17 12:54:58.773219000 -400 EDT ./shieldd: INFO:  sending create-object to [tenant:14cae941-060e-4aae-befb-26ce1c8df2b1] for task [34a9ebe1-5040-4deb-9d31-02faf0245d81]
+2019-06-17 12:54:58.902605000 -400 EDT ./shieldd: INFO:  sending update-object to [tenant:14cae941-060e-4aae-befb-26ce1c8df2b1] for store [66e10c9f-a9f1-4286-8c9e-208bc1065aa4]
+2019-06-17 12:54:58.908821000 -400 EDT ./shieldd: INFO:  sending create-object to [tenant:14cae941-060e-4aae-befb-26ce1c8df2b1] for task [90e16851-5812-4d04-8837-312466a3f27e]
+2019-06-17 12:54:59.034765000 -400 EDT ./shieldd: INFO:  sending update-object to [tenant:14cae941-060e-4aae-befb-26ce1c8df2b1] for store [66e10c9f-a9f1-4286-8c9e-208bc1065aa4]
+2019-06-17 12:54:59.038330000 -400 EDT ./shieldd: INFO:  sending create-object to [tenant:14cae941-060e-4aae-befb-26ce1c8df2b1] for task [2ac94489-61c3-46c4-bec9-cf6064076776]
+2019-06-17 12:54:59.281048000 -400 EDT ./shieldd: INFO:  sending delete-object to [tenant:14cae941-060e-4aae-befb-26ce1c8df2b1] for store [66e10c9f-a9f1-4286-8c9e-208bc1065aa4]
+2019-06-17 12:55:01.345325000 -400 EDT ./shieldd: INFO:  sending create-object to [tenant:14cae941-060e-4aae-befb-26ce1c8df2b1] for target [c044694d-3792-4bf0-9da9-7059954f9a65]
+2019-06-17 12:55:01.378601000 -400 EDT ./shieldd: INFO:  sending create-object to [tenant:14cae941-060e-4aae-befb-26ce1c8df2b1] for store [69c84164-ceaa-4198-b2ee-3bc7ae8d7493]
+2019-06-17 12:55:01.382846000 -400 EDT ./shieldd: INFO:  sending create-object to [tenant:14cae941-060e-4aae-befb-26ce1c8df2b1] for task [c7446ca9-ce6e-4899-81a0-ec3192925734]
+2019-06-17 12:55:01.433789000 -400 EDT ./shieldd: INFO:  sending create-object to [tenant:14cae941-060e-4aae-befb-26ce1c8df2b1] for job [dea9dc07-1958-4be9-8219-922b8944a8da]
+2019-06-17 12:55:01.551760000 -400 EDT ./shieldd: INFO:  sending update-object to [tenant:14cae941-060e-4aae-befb-26ce1c8df2b1] for job [dea9dc07-1958-4be9-8219-922b8944a8da]
+2019-06-17 12:55:01.895389000 -400 EDT ./shieldd: INFO:  sending update-object to [tenant:14cae941-060e-4aae-befb-26ce1c8df2b1] for job [dea9dc07-1958-4be9-8219-922b8944a8da]
+2019-06-17 12:55:02.035889000 -400 EDT ./shieldd: INFO:  sending update-object to [tenant:14cae941-060e-4aae-befb-26ce1c8df2b1] for job [dea9dc07-1958-4be9-8219-922b8944a8da]
+2019-06-17 12:55:02.168484000 -400 EDT ./shieldd: INFO:  sending delete-object to [tenant:14cae941-060e-4aae-befb-26ce1c8df2b1] for target [c044694d-3792-4bf0-9da9-7059954f9a65]
+2019-06-17 12:55:02.248867000 -400 EDT ./shieldd: INFO:  sending delete-object to [tenant:14cae941-060e-4aae-befb-26ce1c8df2b1] for store [69c84164-ceaa-4198-b2ee-3bc7ae8d7493]
+2019-06-17 12:55:02.325260000 -400 EDT ./shieldd: INFO:  sending delete-object to [tenant:14cae941-060e-4aae-befb-26ce1c8df2b1] for job [dea9dc07-1958-4be9-8219-922b8944a8da]

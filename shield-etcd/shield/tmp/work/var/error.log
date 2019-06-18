@@ -1,0 +1,1 @@
+2019/06/18 14:35:30 [error] 78509#0: *1 kevent() reported that connect() failed (61: Connection refused) while connecting to upstream, client: 127.0.0.1, server: , request: "GET /v2/info HTTP/1.1", upstream: "http://127.0.0.1:8180/v2/info", host: "127.0.0.1:8181"

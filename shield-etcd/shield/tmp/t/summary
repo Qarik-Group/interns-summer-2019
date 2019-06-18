@@ -1,0 +1,395 @@
+[1;32m[ OK ][0m /v2/info should ping ok
+[1;32m[ OK ][0m /v1/meta/pubkey gives out the daemon PUBLIC key
+[1;32m[ OK ][0m `shield create-tenant --name Stark Enterprises' should succeed
+[1;32m[ OK ][0m `shield create-user --name Tony Stark --username tony --password J.A.R.V.I.S. --system-role admin' should succeed
+[1;32m[ OK ][0m `shield invite --tenant Stark Enterprises --role admin tony' should succeed
+[1;32m[ OK ][0m `shield create-user --name J.A.R.V.I.S. --username jarvis --password T.O.N.Y.' should succeed
+[1;32m[ OK ][0m `shield invite --tenant Stark Enterprises --role operator jarvis' should succeed
+[1;32m[ OK ][0m `shield create-tenant --name Wayne Industries' should succeed
+[1;32m[ OK ][0m `shield create-user --name Bruce Wayne --username bruce --password by-day' should succeed
+[1;32m[ OK ][0m `shield invite --tenant Wayne Industries --role operator bruce' should succeed
+[1;32m[ OK ][0m `shield create-user --name Batman --username batman --password by-knight' should succeed
+[1;32m[ OK ][0m `shield invite --role admin batman' should succeed
+[1;32m[ OK ][0m `shield login --username tony --password J.A.R.V.I.S.' should succeed
+[1;32m[ OK ][0m `shield targets' should succeed
+[1;32m[ OK ][0m Initial targets list should be empty
+[1;32m[ OK ][0m `shield stores' should succeed
+[1;32m[ OK ][0m Initial stores list should be empty
+[1;32m[ OK ][0m `shield jobs' should succeed
+[1;32m[ OK ][0m Initial jobs list should be empty
+[1;32m[ OK ][0m `shield users' should succeed
+[1;32m[ OK ][0m Initial users list should have the failsafe user
+[1;32m[ OK ][0m `shield tenants' should succeed
+[1;32m[ OK ][0m Initial tenants list shouldn't be empty
+[1;32m[ OK ][0m `shield auth-tokens' should succeed
+[1;32m[ OK ][0m Initial tokens list should be empty
+[1;32m[ OK ][0m `shield create-target --name redis-shared --summary Shared Redis services for CF --agent 127.0.0.1:5441 --plugin redis --data host=127.0.0.1 --data bgsave=BGSAVE' should succeed
+[1;32m[ OK ][0m `shield create-target --name s3 --summary Amazon S3 Blobstore --agent 127.0.0.1:5441 --plugin s3' should succeed
+[1;32m[ OK ][0m `shield create-target --name shield --summary SHIELD itself --agent 127.0.0.1:5441 --plugin postgres' should succeed
+[1;32m[ OK ][0m `shield create-store --name fs --summary A filesystem store --agent 127.0.0.1:5441 --plugin fs --data dir=/path/to/data --data tar=bsdtar' should succeed
+[1;32m[ OK ][0m `shield create-store --name s3 --summary Amazon S3 Archival Storage --agent 127.0.0.1:5441 --plugin s3' should succeed
+[1;32m[ OK ][0m `shield create-store --name shield --summary SHIELD-FS --agent 127.0.0.1:5441 --plugin fs' should succeed
+[1;32m[ OK ][0m `shield create-job --name redis-daily-to-fs --summary Daily Backups of Redis to the local fs --exact --target redis-shared --store fs --schedule daily at 11:24pm --retain 8 --paused' should succeed
+[1;32m[ OK ][0m `shield create-job --name shield-itself --summary Backing up SHIELDs database, via SHIELD... --exact --target shield --store shield --schedule tuesdays at 11am --retain 100' should succeed
+[1;32m[ OK ][0m `shield create-auth-token test1' should succeed
+[1;31m[FAIL][0m 'name' was present when we asked for a newly-created token
+[1;31m[FAIL][0m 'session' was not present when we asked for a newly-created token
+[1;32m[ OK ][0m `shield auth-tokens' should succeed
+[1;31m[FAIL][0m token 'test1' should show up in the list of auth-tokens
+[1;32m[ OK ][0m `shield revoke-auth-token test1' should succeed
+[1;32m[ OK ][0m `shield auth-tokens' should succeed
+[1;32m[ OK ][0m token 'test1' should not show up in the list of auth-tokens (post-revocation)
+[1;32m[ OK ][0m `shield tenant Stark Enterprises' should succeed
+[1;31m[FAIL][0m 'name' was present when we asked for a single tenant
+[1;32m[ OK ][0m `shield tenants' should succeed
+[1;31m[FAIL][0m tenant 'Stark Enterprises' is not a thing.  this is a bug in the test
+[1;31m[FAIL][0m tenant 'Wayne Industries' is not a thing.  this is a bug in the test
+[1;32m[ OK ][0m `shield tenants stark' should succeed
+[1;31m[FAIL][0m tenant 'Stark Enterprises' is not a thing.  this is a bug in the test
+[1;31m[FAIL][0m tenant 'Wayne Industries' is not a thing.  this is a bug in the test
+[1;32m[ OK ][0m `shield create-tenant --name my-new-tenant' should succeed
+[1;32m[ OK ][0m `shield tenant my-new-tenant' should succeed
+[1;31m[FAIL][0m 'name' was present when we asked for a newly-created tenant
+[1;32m[ OK ][0m `shield update-tenant my-new-tenant --name my-updated-tenant' should succeed
+[1;32m[ OK ][0m `shield tenant my-updated-tenant' should succeed
+[1;31m[FAIL][0m 'name' was present when we asked for a newly-renamed tenant
+[1;32m[ OK ][0m `shield create-tenant --name tenant3' should succeed
+[1;32m[ OK ][0m `shield tenant tenant3' should succeed
+[1;31m[FAIL][0m user 'tony' is not a thing.  this is a bug in the test
+[1;32m[ OK ][0m `shield invite --tenant tenant3 --role operator tony jarvis' should succeed
+[1;32m[ OK ][0m `shield tenant tenant3' should succeed
+[1;31m[FAIL][0m user 'tony' is not a thing.  this is a bug in the test
+[1;31m[FAIL][0m user 'jarvis' is not a thing.  this is a bug in the test
+[1;31m[FAIL][0m tony should have the operator role after inviting tony and jarvis as operators
+[1;31m[FAIL][0m jarvis should have the operator role after inviting tony and jarvis as operators
+[1;32m[ OK ][0m `shield invite --tenant tenant3 --role engineer jarvis' should succeed
+[1;32m[ OK ][0m `shield tenant tenant3' should succeed
+[1;31m[FAIL][0m user 'tony' is not a thing.  this is a bug in the test
+[1;31m[FAIL][0m user 'jarvis' is not a thing.  this is a bug in the test
+[1;31m[FAIL][0m tony should have the operator role after re-inviting jarvis as an engineer
+[1;31m[FAIL][0m jarvis should have the engineer role after re-inviting jarvis as an engineer
+[1;32m[ OK ][0m `shield banish --tenant tenant3 tony' should succeed
+[1;32m[ OK ][0m `shield tenant tenant3' should succeed
+[1;31m[FAIL][0m user 'tony' is not a thing.  this is a bug in the test
+[1;31m[FAIL][0m user 'jarvis' is not a thing.  this is a bug in the test
+[1;31m[FAIL][0m jarvis should have the engineer role after banishing tony
+[1;32m[ OK ][0m `shield banish --tenant tenant3 tony' should succeed
+[1;32m[ OK ][0m `shield tenant tenant3' should succeed
+[1;31m[FAIL][0m user 'tony' is not a thing.  this is a bug in the test
+[1;31m[FAIL][0m user 'jarvis' is not a thing.  this is a bug in the test
+[1;31m[FAIL][0m jarvis should have the engineer role after banishing tony (a second time)
+[1;32m[ OK ][0m `shield user jarvis' should succeed
+[1;31m[FAIL][0m 'name' was present when we asked for a single non-system user
+[1;31m[FAIL][0m 'account' was present when we asked for a single non-system user
+[1;32m[ OK ][0m 'sysrole' was present when we asked for a single non-system user
+[1;32m[ OK ][0m `shield user tony' should succeed
+[1;31m[FAIL][0m 'name' was present when we asked for a single system user
+[1;31m[FAIL][0m 'account' was present when we asked for a single system user
+[1;31m[FAIL][0m 'sysrole' was present when we asked for a single system user
+[1;32m[ OK ][0m `shield users' should succeed
+[1;31m[FAIL][0m user 'tony' is not a thing.  this is a bug in the test
+[1;31m[FAIL][0m user 'jarvis' is not a thing.  this is a bug in the test
+[1;31m[FAIL][0m 'name' was present when we asked for the tony account (in all users)
+[1;31m[FAIL][0m 'account' was present when we asked for the tony account (in all users)
+[1;31m[FAIL][0m 'sysrole' was present when we asked for the tony account (in all users)
+[1;32m[ OK ][0m `shield users --fuzzy a' should succeed
+[1;31m[FAIL][0m user 'tony' is not a thing.  this is a bug in the test
+[1;31m[FAIL][0m user 'jarvis' is not a thing.  this is a bug in the test
+[1;32m[ OK ][0m `shield users --fuzzy xyzzy' should succeed
+[1;32m[ OK ][0m no users with account "*xyzzy*"
+[1;32m[ OK ][0m `shield users --with-system-role admin' should succeed
+[1;31m[FAIL][0m user 'tony' is not a thing.  this is a bug in the test
+[1;31m[FAIL][0m user 'jarvis' is not a thing.  this is a bug in the test
+[1;32m[ OK ][0m `shield create-user --name my-new-user --username user42 --password temp-password' should succeed
+[1;32m[ OK ][0m `shield user user42' should succeed
+[1;31m[FAIL][0m 'name' was present when we asked for a newly-created user
+[1;31m[FAIL][0m 'account' was present when we asked for a newly-created user
+[1;32m[ OK ][0m 'sysrole' was present when we asked for a newly-created user
+[1;32m[ OK ][0m `shield update-user user42 --name my-updated-user' should succeed
+[1;32m[ OK ][0m `shield user user42' should succeed
+[1;31m[FAIL][0m 'name' was present when we asked for a newly-updated user
+[1;31m[FAIL][0m 'account' was present when we asked for a newly-updated user
+[1;32m[ OK ][0m 'sysrole' was present when we asked for a newly-updated user
+[1;32m[ OK ][0m `shield update-user user42 --system-role engineer' should succeed
+[1;32m[ OK ][0m `shield user user42' should succeed
+[1;31m[FAIL][0m 'name' was present when we asked for a newly-updated user
+[1;31m[FAIL][0m 'account' was present when we asked for a newly-updated user
+[1;31m[FAIL][0m 'sysrole' was present when we asked for a newly-updated user
+[1;32m[ OK ][0m `shield logout' should succeed
+[1;32m[ OK ][0m `shield login --username user42 --password temp-password' should succeed
+[1;32m[ OK ][0m `shield passwd --no-batch' should succeed
+[1;32m[ OK ][0m `shield logout' should succeed
+[1;32m[ OK ][0m `shield login --username user42 --password new-password' should succeed
+[1;32m[ OK ][0m `shield logout' should succeed
+[1;32m[ OK ][0m `shield login --username tony --password J.A.R.V.I.S.' should succeed
+[1;32m[ OK ][0m Should be allowed to delete user 'user42': users can always be deleted
+[1;32m[ OK ][0m user 'user42' should not be retrievable after successful delete attempt
+[1;32m[ OK ][0m `shield target s3' should succeed
+[1;31m[FAIL][0m 'name' was present when we asked for a single target
+[1;31m[FAIL][0m 'summary' was present when we asked for a single target
+[1;31m[FAIL][0m 'agent' was present when we asked for a single target
+[1;31m[FAIL][0m 'plugin' was present when we asked for a single target
+[1;32m[ OK ][0m `shield targets' should succeed
+[1;31m[FAIL][0m target 's3' is not a thing.  this is a bug in the test
+[1;31m[FAIL][0m target 'redis-shared' is not a thing.  this is a bug in the test
+[1;31m[FAIL][0m 'name' was present when we asked for all targets
+[1;31m[FAIL][0m 'summary' was present when we asked for all targets
+[1;31m[FAIL][0m 'agent' was present when we asked for all targets
+[1;31m[FAIL][0m 'plugin' was present when we asked for all targets
+[1;32m[ OK ][0m `shield targets redis-shared' should succeed
+[1;31m[FAIL][0m target 's3' is not a thing.  this is a bug in the test
+[1;31m[FAIL][0m target 'redis-shared' is not a thing.  this is a bug in the test
+[1;32m[ OK ][0m `shield targets --fuzzy redis' should succeed
+[1;31m[FAIL][0m target 's3' is not a thing.  this is a bug in the test
+[1;31m[FAIL][0m target 'redis-shared' is not a thing.  this is a bug in the test
+[1;32m[ OK ][0m `shield targets s' should succeed
+[1;31m[FAIL][0m target 's3' is not a thing.  this is a bug in the test
+[1;31m[FAIL][0m target 'redis-shared' is not a thing.  this is a bug in the test
+[1;32m[ OK ][0m `shield targets xyzzy' should succeed
+[1;32m[ OK ][0m no targets are named "*xyzzy*"
+[1;32m[ OK ][0m `shield targets --used' should succeed
+[1;31m[FAIL][0m target 's3' is not a thing.  this is a bug in the test
+[1;31m[FAIL][0m target 'redis-shared' is not a thing.  this is a bug in the test
+[1;32m[ OK ][0m `shield targets --unused' should succeed
+[1;31m[FAIL][0m target 's3' is not a thing.  this is a bug in the test
+[1;31m[FAIL][0m target 'redis-shared' is not a thing.  this is a bug in the test
+[1;32m[ OK ][0m `shield targets --with-plugin redis' should succeed
+[1;31m[FAIL][0m target 's3' is not a thing.  this is a bug in the test
+[1;31m[FAIL][0m target 'redis-shared' is not a thing.  this is a bug in the test
+[1;32m[ OK ][0m `shield targets --with-plugin enoent' should succeed
+[1;32m[ OK ][0m Should find no results for bogus target plugin search
+[1;32m[ OK ][0m `shield targets --with-plugin redis --unused' should succeed
+[1;32m[ OK ][0m No targets matched unused && plugin=redis
+[1;32m[ OK ][0m `shield targets --with-plugin redis --used' should succeed
+[1;31m[FAIL][0m target 's3' is not a thing.  this is a bug in the test
+[1;31m[FAIL][0m target 'redis-shared' is not a thing.  this is a bug in the test
+[1;32m[ OK ][0m `shield create-target --name my-new-target --summary A target suitable for editing --agent 127.0.0.1:5441 --plugin fs --data dir=/path/to/data' should succeed
+[1;32m[ OK ][0m `shield target --exact my-new-target' should succeed
+[1;31m[FAIL][0m 'name' was present when we asked for a newly-created target
+[1;31m[FAIL][0m 'summary' was present when we asked for a newly-created target
+[1;31m[FAIL][0m 'agent' was present when we asked for a newly-created target
+[1;31m[FAIL][0m 'plugin' was present when we asked for a newly-created target
+[1;31m[FAIL][0m 'config.dir' was present when we asked for a newly-created target
+[1;32m[ OK ][0m `shield update-target my-new-target --name my-updated-target --summary A New Summary --data dir=/new/path' should succeed
+[1;32m[ OK ][0m `shield target --exact my-updated-target' should succeed
+[1;31m[FAIL][0m 'name' was present when we asked for a newly-updated target
+[1;31m[FAIL][0m 'summary' was present when we asked for a newly-updated target
+[1;31m[FAIL][0m 'agent' was present when we asked for a newly-updated target
+[1;31m[FAIL][0m 'plugin' was present when we asked for a newly-updated target
+[1;31m[FAIL][0m 'config.dir' was present when we asked for a newly-updated target
+[1;32m[ OK ][0m `shield update-target my-updated-target --data new=data' should succeed
+[1;32m[ OK ][0m `shield target --exact my-updated-target' should succeed
+[1;31m[FAIL][0m 'name' was present when we asked for a newly-updated target
+[1;31m[FAIL][0m 'summary' was present when we asked for a newly-updated target
+[1;31m[FAIL][0m 'agent' was present when we asked for a newly-updated target
+[1;31m[FAIL][0m 'plugin' was present when we asked for a newly-updated target
+[1;31m[FAIL][0m 'config.dir' was present when we asked for a newly-updated target
+[1;31m[FAIL][0m 'config.new' was present when we asked for a newly-updated target
+[1;32m[ OK ][0m `shield update-target my-updated-target --clear-data --data dir=/another/path' should succeed
+[1;32m[ OK ][0m `shield target --exact my-updated-target' should succeed
+[1;31m[FAIL][0m 'name' was present when we asked for a target with a newly-reconfigured plugin
+[1;31m[FAIL][0m 'summary' was present when we asked for a target with a newly-reconfigured plugin
+[1;31m[FAIL][0m 'agent' was present when we asked for a target with a newly-reconfigured plugin
+[1;31m[FAIL][0m 'plugin' was present when we asked for a target with a newly-reconfigured plugin
+[1;31m[FAIL][0m 'config.dir' was present when we asked for a target with a newly-reconfigured plugin
+[1;32m[ OK ][0m 'config.new' was present when we asked for a target with a newly-reconfigured plugin
+[1;32m[ OK ][0m `shield update-target my-updated-target --plugin s3' should succeed
+[1;32m[ OK ][0m `shield target --exact my-updated-target' should succeed
+[1;31m[FAIL][0m 'name' was present when we asked for a target with a newly-changed plugin
+[1;31m[FAIL][0m 'summary' was present when we asked for a target with a newly-changed plugin
+[1;31m[FAIL][0m 'agent' was present when we asked for a target with a newly-changed plugin
+[1;31m[FAIL][0m 'plugin' was present when we asked for a target with a newly-changed plugin
+[1;32m[ OK ][0m 'config.dir' was present when we asked for a target with a newly-changed plugin
+[1;32m[ OK ][0m 'config.new' was present when we asked for a target with a newly-changed plugin
+[1;32m[ OK ][0m Should not be allowed to delete target 'redis-shared': it is in use by at least one job
+[1;31m[FAIL][0m `shield target' should succeed
+[1;31m[FAIL][0m 'name' was present when we asked for target 'redis-shared' should be unaffected by failed DELETE attempt
+[1;32m[ OK ][0m Should be allowed to delete target 'my-updated-target': it is not in use by any jobs
+[1;32m[ OK ][0m target 'my-updated-target' should not be retrievable after successful delete attempt
+[1;32m[ OK ][0m `shield store s3' should succeed
+[1;31m[FAIL][0m 'name' was present when we asked for a single store
+[1;31m[FAIL][0m 'summary' was present when we asked for a single store
+[1;31m[FAIL][0m 'plugin' was present when we asked for a single store
+[1;32m[ OK ][0m `shield stores' should succeed
+[1;31m[FAIL][0m store 's3' is not a thing.  this is a bug in the test
+[1;31m[FAIL][0m store 'fs' is not a thing.  this is a bug in the test
+[1;31m[FAIL][0m 'name' was present when we asked for all stores
+[1;31m[FAIL][0m 'summary' was present when we asked for all stores
+[1;31m[FAIL][0m 'plugin' was present when we asked for all stores
+[1;32m[ OK ][0m `shield stores fs' should succeed
+[1;31m[FAIL][0m store 's3' is not a thing.  this is a bug in the test
+[1;31m[FAIL][0m store 'fs' is not a thing.  this is a bug in the test
+[1;32m[ OK ][0m `shield stores --fuzzy F' should succeed
+[1;31m[FAIL][0m store 's3' is not a thing.  this is a bug in the test
+[1;31m[FAIL][0m store 'fs' is not a thing.  this is a bug in the test
+[1;32m[ OK ][0m `shield stores --fuzzy s' should succeed
+[1;31m[FAIL][0m store 's3' is not a thing.  this is a bug in the test
+[1;31m[FAIL][0m store 'fs' is not a thing.  this is a bug in the test
+[1;32m[ OK ][0m `shield stores --fuzzy xyzzy' should succeed
+[1;32m[ OK ][0m no stores are named "*xyzzy*"
+[1;32m[ OK ][0m `shield stores --used' should succeed
+[1;31m[FAIL][0m store 's3' is not a thing.  this is a bug in the test
+[1;31m[FAIL][0m store 'fs' is not a thing.  this is a bug in the test
+[1;32m[ OK ][0m `shield stores --unused' should succeed
+[1;31m[FAIL][0m store 's3' is not a thing.  this is a bug in the test
+[1;31m[FAIL][0m store 'fs' is not a thing.  this is a bug in the test
+[1;32m[ OK ][0m `shield stores --with-plugin fs' should succeed
+[1;31m[FAIL][0m store 's3' is not a thing.  this is a bug in the test
+[1;31m[FAIL][0m store 'fs' is not a thing.  this is a bug in the test
+[1;32m[ OK ][0m `shield stores --with-plugin enoent' should succeed
+[1;32m[ OK ][0m Should find no results for bogus store plugin search
+[1;32m[ OK ][0m `shield stores --with-plugin fs --unused' should succeed
+[1;32m[ OK ][0m No stores matched unused && plugin=fs
+[1;32m[ OK ][0m `shield stores --with-plugin fs --used' should succeed
+[1;31m[FAIL][0m store 's3' is not a thing.  this is a bug in the test
+[1;31m[FAIL][0m store 'fs' is not a thing.  this is a bug in the test
+[1;32m[ OK ][0m `shield create-store --name my-new-store --summary A store, suitable for editing --agent 127.0.0.1:5441 --plugin s3 --data aki=my-aki' should succeed
+[1;32m[ OK ][0m `shield store --exact my-new-store' should succeed
+[1;31m[FAIL][0m 'name' was present when we asked for a newly-created store
+[1;31m[FAIL][0m 'summary' was present when we asked for a newly-created store
+[1;31m[FAIL][0m 'agent' was present when we asked for a newly-created store
+[1;31m[FAIL][0m 'plugin' was present when we asked for a newly-created store
+[1;31m[FAIL][0m 'config.aki' was present when we asked for a newly-created store
+[1;32m[ OK ][0m `shield update-store my-new-store --name my-updated-store --summary A Newer, Different AWS' should succeed
+[1;32m[ OK ][0m `shield store --exact my-updated-store' should succeed
+[1;31m[FAIL][0m 'name' was present when we asked for a newly-updated store
+[1;31m[FAIL][0m 'summary' was present when we asked for a newly-updated store
+[1;31m[FAIL][0m 'agent' was present when we asked for a newly-updated store
+[1;31m[FAIL][0m 'plugin' was present when we asked for a newly-updated store
+[1;31m[FAIL][0m 'config.aki' was present when we asked for a newly-updated store
+[1;32m[ OK ][0m `shield update-store my-updated-store --data key=sekrit' should succeed
+[1;32m[ OK ][0m `shield store --exact my-updated-store' should succeed
+[1;31m[FAIL][0m 'name' was present when we asked for a newly-updated store
+[1;31m[FAIL][0m 'summary' was present when we asked for a newly-updated store
+[1;31m[FAIL][0m 'agent' was present when we asked for a newly-updated store
+[1;31m[FAIL][0m 'plugin' was present when we asked for a newly-updated store
+[1;31m[FAIL][0m 'config.aki' was present when we asked for a newly-updated store
+[1;31m[FAIL][0m 'config.key' was present when we asked for a newly-updated store
+[1;32m[ OK ][0m `shield update-store my-updated-store --clear-data --data aki=my-other-aki' should succeed
+[1;32m[ OK ][0m `shield store --exact my-updated-store' should succeed
+[1;31m[FAIL][0m 'name' was present when we asked for a store with a newly-reconfigured plugin
+[1;31m[FAIL][0m 'summary' was present when we asked for a store with a newly-reconfigured plugin
+[1;31m[FAIL][0m 'agent' was present when we asked for a store with a newly-reconfigured plugin
+[1;31m[FAIL][0m 'plugin' was present when we asked for a store with a newly-reconfigured plugin
+[1;31m[FAIL][0m 'config.aki' was present when we asked for a store with a newly-reconfigured plugin
+[1;32m[ OK ][0m 'config.key' was present when we asked for a store with a newly-reconfigured plugin
+[1;32m[ OK ][0m `shield update-store my-updated-store --plugin fs' should succeed
+[1;32m[ OK ][0m `shield store --exact my-updated-store' should succeed
+[1;31m[FAIL][0m 'name' was present when we asked for a store with a newly-changed plugin
+[1;31m[FAIL][0m 'summary' was present when we asked for a store with a newly-changed plugin
+[1;31m[FAIL][0m 'agent' was present when we asked for a store with a newly-changed plugin
+[1;31m[FAIL][0m 'plugin' was present when we asked for a store with a newly-changed plugin
+[1;32m[ OK ][0m 'config.aki' was present when we asked for a store with a newly-changed plugin
+[1;32m[ OK ][0m 'config.key' was present when we asked for a store with a newly-changed plugin
+[1;32m[ OK ][0m Should not be allowed to delete store 'fs': it is in use by at least one job
+[1;31m[FAIL][0m `shield store' should succeed
+[1;31m[FAIL][0m 'name' was present when we asked for store 'fs' should be unaffected by failed DELETE attempt
+[1;32m[ OK ][0m Should be allowed to delete store 'my-updated-store': it is not in use by any jobs
+[1;32m[ OK ][0m store 'my-updated-store' should not be retrievable after successful delete attempt
+[1;32m[ OK ][0m `shield job redis-daily-to-fs' should succeed
+[1;31m[FAIL][0m 'name' was present when we asked for a single job
+[1;31m[FAIL][0m 'summary' was present when we asked for a single job
+[1;31m[FAIL][0m 'schedule' was present when we asked for a single job
+[1;31m[FAIL][0m 'keep_days' was present when we asked for a single job
+[1;32m[ OK ][0m 'store.uuid' was present when we asked for a single job
+[1;31m[FAIL][0m 'store.name' was present when we asked for a single job
+[1;31m[FAIL][0m 'store.plugin' was present when we asked for a single job
+[1;31m[FAIL][0m 'store.endpoint' was present when we asked for a single job
+[1;32m[ OK ][0m 'target.uuid' was present when we asked for a single job
+[1;31m[FAIL][0m 'target.name' was present when we asked for a single job
+[1;31m[FAIL][0m 'target.plugin' was present when we asked for a single job
+[1;31m[FAIL][0m 'target.endpoint' was present when we asked for a single job
+[1;31m[FAIL][0m 'agent' was present when we asked for a single job
+[1;31m[FAIL][0m 'paused' was present when we asked for a single job
+[1;32m[ OK ][0m `shield jobs' should succeed
+[1;31m[FAIL][0m job 'redis-daily-to-fs' is not a thing.  this is a bug in the test
+[1;31m[FAIL][0m job 'shield-itself' is not a thing.  this is a bug in the test
+[1;32m[ OK ][0m 'uuid' was present when we asked for all jobs
+[1;31m[FAIL][0m 'name' was present when we asked for all jobs
+[1;31m[FAIL][0m 'summary' was present when we asked for all jobs
+[1;31m[FAIL][0m 'schedule' was present when we asked for all jobs
+[1;31m[FAIL][0m 'keep_days' was present when we asked for all jobs
+[1;32m[ OK ][0m 'store.uuid' was present when we asked for all jobs
+[1;31m[FAIL][0m 'store.name' was present when we asked for all jobs
+[1;31m[FAIL][0m 'store.plugin' was present when we asked for all jobs
+[1;31m[FAIL][0m 'store.endpoint' was present when we asked for all jobs
+[1;32m[ OK ][0m 'target.uuid' was present when we asked for all jobs
+[1;31m[FAIL][0m 'target.name' was present when we asked for all jobs
+[1;31m[FAIL][0m 'target.plugin' was present when we asked for all jobs
+[1;31m[FAIL][0m 'target.endpoint' was present when we asked for all jobs
+[1;31m[FAIL][0m 'agent' was present when we asked for all jobs
+[1;31m[FAIL][0m 'paused' was present when we asked for all jobs
+[1;32m[ OK ][0m `shield jobs redis-daily-to-fs' should succeed
+[1;31m[FAIL][0m job 'shield-itself' is not a thing.  this is a bug in the test
+[1;31m[FAIL][0m job 'redis-daily-to-fs' is not a thing.  this is a bug in the test
+[1;32m[ OK ][0m `shield jobs --fuzzy daily' should succeed
+[1;31m[FAIL][0m job 'shield-itself' is not a thing.  this is a bug in the test
+[1;31m[FAIL][0m job 'redis-daily-to-fs' is not a thing.  this is a bug in the test
+[1;32m[ OK ][0m `shield jobs --fuzzy f' should succeed
+[1;31m[FAIL][0m job 'shield-itself' is not a thing.  this is a bug in the test
+[1;31m[FAIL][0m job 'redis-daily-to-fs' is not a thing.  this is a bug in the test
+[1;32m[ OK ][0m `shield jobs --fuzzy xyzzy' should succeed
+[1;32m[ OK ][0m no jobs are named "*xyzzy*"
+[1;31m[FAIL][0m `shield jobs --target' should succeed
+[1;31m[FAIL][0m job 'shield-itself' is not a thing.  this is a bug in the test
+[1;31m[FAIL][0m job 'redis-daily-to-fs' is not a thing.  this is a bug in the test
+[1;31m[FAIL][0m `shield jobs --store' should succeed
+[1;32m[ OK ][0m `shield jobs --store <uuid>' should succeed
+[1;31m[FAIL][0m job 'shield-itself' is not a thing.  this is a bug in the test
+[1;31m[FAIL][0m job 'redis-daily-to-fs' is not a thing.  this is a bug in the test
+[1;32m[ OK ][0m `shield jobs --paused' should succeed
+[1;31m[FAIL][0m job 'shield-itself' is not a thing.  this is a bug in the test
+[1;31m[FAIL][0m job 'redis-daily-to-fs' is not a thing.  this is a bug in the test
+[1;32m[ OK ][0m `shield jobs --unpaused' should succeed
+[1;31m[FAIL][0m job 'shield-itself' is not a thing.  this is a bug in the test
+[1;31m[FAIL][0m job 'redis-daily-to-fs' is not a thing.  this is a bug in the test
+[1;31m[FAIL][0m `shield pause-job ' should succeed
+[1;31m[FAIL][0m `shield job ' should succeed
+[1;31m[FAIL][0m 'paused' was present when we asked for paused job (shield-itself)
+[1;31m[FAIL][0m `shield unpause-job ' should succeed
+[1;31m[FAIL][0m `shield job ' should succeed
+[1;32m[ OK ][0m 'paused' was present when we asked for unpaused job (shield-itself)
+[1;31m[FAIL][0m `shield pause-job ' should succeed
+[1;31m[FAIL][0m `shield job ' should succeed
+[1;31m[FAIL][0m 'paused' was present when we asked for paused job (shield-itself)
+[1;32m[ OK ][0m `shield create-target --name job-target --agent 127.0.0.1:5441 --plugin fs' should succeed
+[1;32m[ OK ][0m `shield create-store --name job-store --agent 127.0.0.1:5441 --plugin fs' should succeed
+[1;32m[ OK ][0m `shield create-job --name my-new-job --summary A new job, suitable for editing --schedule daily 4am --exact --target job-target --store job-store --retain 5' should succeed
+[1;32m[ OK ][0m `shield job my-new-job' should succeed
+[1;31m[FAIL][0m 'summary' was present when we asked for a newly-created job
+[1;31m[FAIL][0m 'schedule' was present when we asked for a newly-created job
+[1;31m[FAIL][0m 'keep_days' was present when we asked for a newly-created job
+[1;31m[FAIL][0m 'target.name' was present when we asked for a newly-created job
+[1;31m[FAIL][0m 'store.name' was present when we asked for a newly-created job
+[1;32m[ OK ][0m `shield update-job my-new-job --name my-updated-job --summary A New Summary' should succeed
+[1;32m[ OK ][0m `shield job my-updated-job' should succeed
+[1;31m[FAIL][0m 'summary' was present when we asked for a newly-updated job
+[1;31m[FAIL][0m 'schedule' was present when we asked for a newly-updated job
+[1;31m[FAIL][0m 'target.name' was present when we asked for a newly-updated job
+[1;31m[FAIL][0m 'store.name' was present when we asked for a newly-updated job
+[1;32m[ OK ][0m Should not be allowed to delete target 'job-target': it is in use by our test lifecycle job
+[1;31m[FAIL][0m `shield target' should succeed
+[1;31m[FAIL][0m 'name' was present when we asked for target 'job-target' should be unaffected by failed DELETE attempt
+[1;32m[ OK ][0m Should not be allowed to delete store 'job-store': it is in use by our test lifecycle job
+[1;31m[FAIL][0m `shield store' should succeed
+[1;31m[FAIL][0m 'name' was present when we asked for store 'job-store' should be unaffected by failed DELETE attempt
+[1;32m[ OK ][0m `shield update-job my-updated-job --schedule daily 3:30am --retain 8' should succeed
+[1;32m[ OK ][0m `shield job my-updated-job' should succeed
+[1;31m[FAIL][0m 'summary' was present when we asked for a newly-rescheduled job
+[1;31m[FAIL][0m 'schedule' was present when we asked for a newly-rescheduled job
+[1;31m[FAIL][0m 'target.name' was present when we asked for a newly-rescheduled job
+[1;31m[FAIL][0m 'store.name' was present when we asked for a newly-rescheduled job
+[1;31m[FAIL][0m 'keep_days' was present when we asked for a newly-rescheduled job
+[1;32m[ OK ][0m `shield update-job my-updated-job --target shield --store s3' should succeed
+[1;32m[ OK ][0m `shield job my-updated-job' should succeed
+[1;31m[FAIL][0m 'summary' was present when we asked for a newly-reconfiguredd job
+[1;31m[FAIL][0m 'schedule' was present when we asked for a newly-reconfiguredd job
+[1;31m[FAIL][0m 'target.name' was present when we asked for a newly-reconfiguredd job
+[1;31m[FAIL][0m 'store.name' was present when we asked for a newly-reconfiguredd job
+[1;31m[FAIL][0m 'keep_days' was present when we asked for a newly-reconfiguredd job
+[1;32m[ OK ][0m Should be allowed to delete target 'job-target': is no longer in use by our test lifecycle job
+[1;32m[ OK ][0m target 'job-target' should not be retrievable after successful delete attempt
+[1;32m[ OK ][0m Should be allowed to delete store 'job-store': is no longer in use by our test lifecycle job
+[1;32m[ OK ][0m store 'job-store' should not be retrievable after successful delete attempt
+[1;32m[ OK ][0m Should be allowed to delete job 'my-updated-job': jobs can always be deleted
+[1;32m[ OK ][0m job 'my-updated-job' should not be retrievable after successful delete attempt

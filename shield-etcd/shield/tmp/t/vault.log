@@ -1,0 +1,69 @@
+... retrieving vault 0.9.0 form the web...
+~/go/src/github.com/starkandwayne/shield/tmp/t ~/go/src/github.com/starkandwayne/shield
+Archive:  vault.zip
+  inflating: vault                   
+~/go/src/github.com/starkandwayne/shield
+>> Setting up a local (loopback) Vault
+Vault v0.9.0 ('bdac1854478538052ba5b7ec9a9ec688d35a3335')
+==> WARNING: mlock not supported on this system!
+
+  An `mlockall(2)`-like syscall to prevent memory from being
+  swapped to disk is not supported on this system. Running
+  Vault on an mlockall(2) enabled system is much more secure.
+
+==> Vault server configuration:
+
+                     Cgo: disabled
+              Listener 1: tcp (addr: "127.0.0.1:8219", cluster address: "127.0.0.1:8220", tls: "disabled")
+               Log Level: info
+                   Mlock: supported: false, enabled: false
+                 Storage: inmem
+                 Version: Vault v0.9.0
+             Version Sha: bdac1854478538052ba5b7ec9a9ec688d35a3335
+
+==> Vault server started! Log data will stream in below:
+
+2019/06/17 12:54:35.466447 [INFO ] core: security barrier not initialized
+2019/06/17 12:54:35.467623 [INFO ] core: security barrier not initialized
+2019/06/17 12:54:36.274495 [INFO ] core: security barrier not initialized
+2019/06/17 12:54:36.275795 [INFO ] core: security barrier not initialized
+2019/06/17 12:54:36.277288 [INFO ] core: security barrier not initialized
+2019/06/17 12:54:36.277682 [INFO ] core: security barrier initialized: shares=1 threshold=1
+2019/06/17 12:54:36.278073 [INFO ] core: post-unseal setup starting
+2019/06/17 12:54:36.294283 [INFO ] core: loaded wrapping token key
+2019/06/17 12:54:36.294351 [INFO ] core: successfully setup plugin catalog: plugin-directory=
+2019/06/17 12:54:36.294921 [INFO ] core: successfully mounted backend: type=kv path=secret/
+2019/06/17 12:54:36.294991 [INFO ] core: successfully mounted backend: type=cubbyhole path=cubbyhole/
+2019/06/17 12:54:36.295203 [INFO ] core: successfully mounted backend: type=system path=sys/
+2019/06/17 12:54:36.295480 [INFO ] core: successfully mounted backend: type=identity path=identity/
+2019/06/17 12:54:36.297759 [INFO ] expiration: restoring leases
+2019/06/17 12:54:36.297774 [INFO ] rollback: starting rollback manager
+2019/06/17 12:54:36.298093 [INFO ] expiration: lease restore complete
+2019/06/17 12:54:36.298547 [INFO ] identity: entities restored
+2019/06/17 12:54:36.298611 [INFO ] identity: groups restored
+2019/06/17 12:54:36.298657 [INFO ] core: post-unseal setup complete
+2019/06/17 12:54:36.298894 [INFO ] core: root token generated
+2019/06/17 12:54:36.298927 [INFO ] core: pre-seal teardown starting
+2019/06/17 12:54:36.298955 [INFO ] core: cluster listeners not running
+2019/06/17 12:54:36.299002 [INFO ] rollback: stopping rollback manager
+2019/06/17 12:54:36.299103 [INFO ] core: pre-seal teardown complete
+2019/06/17 12:54:36.300645 [INFO ] core: vault is unsealed
+2019/06/17 12:54:36.300729 [INFO ] core: post-unseal setup starting
+2019/06/17 12:54:36.300817 [INFO ] core: loaded wrapping token key
+2019/06/17 12:54:36.300849 [INFO ] core: successfully setup plugin catalog: plugin-directory=
+2019/06/17 12:54:36.301521 [INFO ] core: successfully mounted backend: type=kv path=secret/
+2019/06/17 12:54:36.301928 [INFO ] core: successfully mounted backend: type=system path=sys/
+2019/06/17 12:54:36.302583 [INFO ] core: successfully mounted backend: type=identity path=identity/
+2019/06/17 12:54:36.302665 [INFO ] core: successfully mounted backend: type=cubbyhole path=cubbyhole/
+2019/06/17 12:54:36.303346 [INFO ] expiration: restoring leases
+2019/06/17 12:54:36.303350 [INFO ] rollback: starting rollback manager
+2019/06/17 12:54:36.303548 [INFO ] identity: entities restored
+2019/06/17 12:54:36.303611 [INFO ] identity: groups restored
+2019/06/17 12:54:36.303681 [INFO ] core: post-unseal setup complete
+2019/06/17 12:54:36.303629 [INFO ] expiration: lease restore complete
+==> Vault shutdown triggered
+2019/06/17 12:55:02.401894 [INFO ] core: pre-seal teardown starting
+2019/06/17 12:55:02.402136 [INFO ] core: cluster listeners not running
+2019/06/17 12:55:02.402200 [INFO ] rollback: stopping rollback manager
+2019/06/17 12:55:02.402725 [INFO ] core: pre-seal teardown complete
+2019/06/17 12:55:02.403112 [INFO ] core: vault is sealed

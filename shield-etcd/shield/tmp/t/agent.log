@@ -1,0 +1,9 @@
+2019-06-17 12:54:36.493041000 -400 EDT ./shield-agent: INFO:  starting agent
+2019-06-17 12:54:36.494773000 -400 EDT ./shield-agent: DEBUG: pinging shield core
+2019-06-17 12:54:36.494977000 -400 EDT ./shield-agent: DEBUG: pre-registering with http://127.0.0.1:8282/v2/agents as {"name":"t-api-agent","port":5441}
+2019-06-17 12:54:36.499412000 -400 EDT ./shield-agent: INFO:  pre-registered with http://127.0.0.1:8282 as t-api-agent (port 5441)
+2019-06-17 12:54:36.499457000 -400 EDT ./shield-agent: DEBUG: POST /v2/agents returned [200 OK]
+2019-06-17 12:54:51.497885000 -400 EDT ./shield-agent: DEBUG: pinging shield core
+2019-06-17 12:54:51.497975000 -400 EDT ./shield-agent: DEBUG: pre-registering with http://127.0.0.1:8282/v2/agents as {"name":"t-api-agent","port":5441}
+2019-06-17 12:54:51.498935000 -400 EDT ./shield-agent: INFO:  pre-registered with http://127.0.0.1:8282 as t-api-agent (port 5441)
+2019-06-17 12:54:51.498979000 -400 EDT ./shield-agent: DEBUG: POST /v2/agents returned [200 OK]
