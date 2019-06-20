@@ -1,12 +1,14 @@
 package main
 
 import (
-	"bufio"
+	"context"
 	"encoding/base64"
 	"log"
 	"os"
+	"time"
 
 	fmt "github.com/jhunt/go-ansi"
+	"go.etcd.io/etcd/clientv3"
 
 	"github.com/starkandwayne/shield/plugin"
 )
@@ -173,42 +175,130 @@ func (p EtcdPlugin) Validate(endpoint plugin.ShieldEndpoint) error {
 
 // Backup ETCD data
 func (p EtcdPlugin) Backup(endpoint plugin.ShieldEndpoint) error {
-	file, err := os.Open("keyval.txt")
+	// file, err := os.Open("keyval.txt")
 
+	// if err != nil {
+	// 	log.Fatalf("failed opening file: %s", err)
+	// }
+
+	// scanner := bufio.NewScanner(file)
+	// scanner.Split(bufio.ScanLines)
+	// var txtlines []string
+
+	// for scanner.Scan() {
+	// 	txtlines = append(txtlines, scanner.Text())
+	// }
+
+	// file.Close()
+	// i := 0
+	// encodedK := ""
+	// encodedV := ""
+	// for _, eachline := range txtlines {
+	// 	data := []byte(eachline)
+	// 	if i%2 == 0 {
+	// 		encodedK = base64.StdEncoding.EncodeToString(data)
+	// 	} else {
+	// 		encodedV = base64.StdEncoding.EncodeToString(data)
+	// 		newLine := fmt.Sprintf("%s : %s", encodedK, encodedV)
+	// 		cmd := fmt.Sprintf("echo %s", newLine)
+	// 		plugin.Exec(cmd, plugin.STDOUT)
+	// 		encodedK = ""
+	// 		encodedV = ""
+	// 	}
+	// 	i++
+	// }
+	etcd, err := getEtcdConfig(endpoint)
 	if err != nil {
-		log.Fatalf("failed opening file: %s", err)
+		return err
 	}
 
-	scanner := bufio.NewScanner(file)
-	scanner.Split(bufio.ScanLines)
-	var txtlines []string
+	cli, err := clientv3.New(clientv3.Config{
+		Endpoints:   []string{etcd.etcdEndpoints},
+		DialTimeout: 2 * time.Second,
+		Username:    etcd.Username,
+		Password:    etcd.Password,
+	})
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer cli.Close()
 
-	for scanner.Scan() {
-		txtlines = append(txtlines, scanner.Text())
+	ctx, cancel := context.WithTimeout(context.Background(), 2*time.Second)
+	resp, err := cli.Get(ctx, "", clientv3.WithPrefix(), clientv3.WithSort(clientv3.SortByKey, clientv3.SortDescend))
+	cancel()
+	if err != nil {
+		log.Fatal(err)
 	}
 
-	file.Close()
-	i := 0
-	encodedK := ""
-	encodedV := ""
-	for _, eachline := range txtlines {
-		data := []byte(eachline)
-		if i%2 == 0 {
-			encodedK = base64.StdEncoding.EncodeToString(data)
-		} else {
-			encodedV = base64.StdEncoding.EncodeToString(data)
-			newLine := fmt.Sprintf("%s : %s", encodedK, encodedV)
-			cmd := fmt.Sprintf("echo %s", newLine)
-			plugin.Exec(cmd, plugin.STDOUT)
-			encodedK = ""
-			encodedV = ""
-		}
-		i++
+	for _, ev := range resp.Kvs {
+		dataK := []byte(ev.Key)
+		dataV := []byte(ev.Value)
+		encodedK := base64.StdEncoding.EncodeToString(dataK)
+		encodedV := base64.StdEncoding.EncodeToString(dataV)
+		newLine := fmt.Sprintf("%s : %s", encodedK, encodedV)
+		cmd := fmt.Sprintf("echo %s", newLine)
+		plugin.Exec(cmd, plugin.STDOUT)
 	}
 	return nil
 }
 
 func (p EtcdPlugin) Restore(endpoint plugin.ShieldEndpoint) error {
+	// etcd, err := getEtcdConfig(endpoint)
+	// if err != nil {
+	// 	return err
+	// }
+
+	// //assuming that archive is in a file
+	// file, err := endpoint.StringValue("file")
+	// if err != nil {
+	// 	return err
+	// }
+	// plugin.Exec(fmt.Sprintf("/bin/sh -c \"/bin/cat > %s\"", file), plugin.STDIN)
+
+	// reader := bufio.NewReader(os.Stdin)
+
+	// //connecting to our cluster
+	// cli, err := clientv3.New(clientv3.Config{
+	// 	Endpoints:   []string{etcd.etcdEndpoints},
+	// 	DialTimeout: 2 * time.Second,
+	// 	Username:    etcd.Username,
+	// 	Password:    etcd.Password,
+	// })
+	// if err != nil {
+	// 	log.Fatal(err)
+	// }
+	// defer cli.Close()
+
+	// for {
+	// 	line, _, err := reader.ReadLine()
+	// 	if err == io.EOF {
+	// 		break
+	// 	}
+
+	// 	a := strings.Split(string(line), " : ")
+	// 	str_key := a[0]
+	// 	str_val := a[1]
+
+	// 	data_key, err := base64.StdEncoding.DecodeString(str_key)
+	// 	data_val, err := base64.StdEncoding.DecodeString(str_val)
+	// 	if err != nil {
+	// 		fmt.Printf("error: %s", err)
+	// 		return err
+	// 	}
+
+	// 	////printing each line of kvs
+	// 	// newLine := fmt.Sprintf("%s : %s", data_key, data_val)
+	// 	// fmt.Println(newLine)
+
+	// 	//// instead put it to etcd cluster
+	// 	ctx, cancel := context.WithTimeout(context.Background(), 2*time.Second)
+	// 	_, err = cli.Put(ctx, fmt.Sprintf("%s", data_key), fmt.Sprintf("%s", data_val))
+	// 	cancel()
+	// 	if err != nil {
+	// 		log.Fatal(err)
+	// 	}
+	// }
+	// return nil
 	return plugin.UNIMPLEMENTED
 }
 
