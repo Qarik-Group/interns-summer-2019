@@ -1,6 +1,9 @@
 package main
 
 import (
+	"bufio"
+	"encoding/base64"
+	"log"
 	"os"
 
 	fmt "github.com/jhunt/go-ansi"
@@ -124,12 +127,12 @@ func (p EtcdPlugin) Validate(endpoint plugin.ShieldEndpoint) error {
 		fmt.Printf("@R{\u2717 endpoints  %s}\n", err)
 		fail = true
 	} else {
-		fmt.Printf("@G{\u2713 endpoints}  files in @C{%s} will be backed up\n", s)
+		fmt.Printf("@G{\u2713 etcd endpoints} data in @C{%s} will be backed up\n", s)
 	}
 
 	auth, err = endpoint.BooleanValueDefault("auth", false)
 	if err != nil {
-		fmt.Printf("@R{\u2717 authentication  %s}\n", err)
+		fmt.Printf("@R{\u2717 authentication %s}\n", err)
 		fail = true
 	} else if auth {
 		fmt.Printf("@G{\u2713 auth} authentication is enabled\n")
@@ -146,7 +149,7 @@ func (p EtcdPlugin) Validate(endpoint plugin.ShieldEndpoint) error {
 			fmt.Printf("@G{\u2717 user} auth was enabled but username was not provided\n")
 			fail = true
 		} else {
-			fmt.Printf("@G{\u2713 user} auth will be done with username @C{%s}\n", s)
+			fmt.Printf("@G{\u2713 username} @C{%s}\n", plugin.Redact(s))
 		}
 
 		s, err = endpoint.StringValueDefault("pass", "")
@@ -157,19 +160,52 @@ func (p EtcdPlugin) Validate(endpoint plugin.ShieldEndpoint) error {
 			fmt.Printf("@R{\u2717 pass} auth was enabled but password was not provided\n")
 			fail = true
 		} else {
-			fmt.Printf("@G{\u2713 user} auth will be done with password @C{%s}\n", s)
+			fmt.Printf("@G{\u2713 password} @C{%s}\n", plugin.Redact(s))
 		}
 	}
 
 	if fail {
-		return fmt.Errorf("fs: invalid configuration")
+		return fmt.Errorf("etcd: invalid configuration")
 	}
 
 	return nil
 }
 
+// Backup ETCD data
 func (p EtcdPlugin) Backup(endpoint plugin.ShieldEndpoint) error {
-	return plugin.UNIMPLEMENTED
+	file, err := os.Open("keyval.txt")
+
+	if err != nil {
+		log.Fatalf("failed opening file: %s", err)
+	}
+
+	scanner := bufio.NewScanner(file)
+	scanner.Split(bufio.ScanLines)
+	var txtlines []string
+
+	for scanner.Scan() {
+		txtlines = append(txtlines, scanner.Text())
+	}
+
+	file.Close()
+	i := 0
+	encodedK := ""
+	encodedV := ""
+	for _, eachline := range txtlines {
+		data := []byte(eachline)
+		if i%2 == 0 {
+			encodedK = base64.StdEncoding.EncodeToString(data)
+		} else {
+			encodedV = base64.StdEncoding.EncodeToString(data)
+			newLine := fmt.Sprintf("%s : %s", encodedK, encodedV)
+			cmd := fmt.Sprintf("echo %s", newLine)
+			plugin.Exec(cmd, plugin.STDOUT)
+			encodedK = ""
+			encodedV = ""
+		}
+		i++
+	}
+	return nil
 }
 
 func (p EtcdPlugin) Restore(endpoint plugin.ShieldEndpoint) error {
