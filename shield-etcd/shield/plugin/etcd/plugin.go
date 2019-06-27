@@ -30,9 +30,14 @@ func main() {
 			{
 			"endpoints" : "https://192.168.42.45:2379"   # REQUIRED
 
-			"auth"  : false				# is role based or cert based auth enabled on the etcd cluster
-			"user"  : "admin",            # username for role based authentication
-			"pass"  : "p@ssw0rd"          # password for role based authentication
+			"auth"  : false												# is role based or cert based auth enabled on the etcd cluster
+			"user"  : "admin",            								# username for role based authentication
+			"pass"  : "p@ssw0rd"          								# password for role based authentication
+			"clientCertPath" : "/tmp/test-certs/test-client.crt" 		# path to client certificate
+			"clientKeyPath"  : "/tmp/test-certs/test-client-key.key" 	# path to client key
+			"caCertPath"     : "/tmp/test-certs/test-ca.crt" 			# path to CA certificate
+			"fullOverride" 	 : "false"									# enable or disable full override of the cluster
+			"prefix"		 : "starkandwayne/"							# backup specific keys
 			}
 			`,
 		Defaults: `
@@ -75,7 +80,7 @@ func main() {
 			},
 			plugin.Field{
 				Mode:    "target",
-				Name:    "clientCertFile",
+				Name:    "clientCertPath",
 				Type:    "string",
 				Help:    "Path to the certificate issued by the CA for the client connecting to the ETCD cluster",
 				Title:   "Client Certificate File Path",
@@ -83,15 +88,15 @@ func main() {
 			},
 			plugin.Field{
 				Mode:    "target",
-				Name:    "clientKeyFile",
+				Name:    "clientKeyPath",
 				Type:    "string",
 				Help:    "Path to the key issued by the CA for the client connecting to the ETCD cluster",
 				Title:   "Client Key File Path",
-				Example: "/tmp/test-certs/test-client-key.keys",
+				Example: "/tmp/test-certs/test-client-key.key",
 			},
 			plugin.Field{
 				Mode:    "target",
-				Name:    "caCertFile",
+				Name:    "caCertPath",
 				Type:    "string",
 				Help:    "Path to the CA certificate that issued the client cert and key",
 				Title:   "Trusted CA File Path",
@@ -104,6 +109,14 @@ func main() {
 				Help:    "If this is enabled, the key/value pairs will be fully overridden",
 				Title:   "Full Override",
 				Example: "false",
+			},
+			plugin.Field{
+				Mode:    "target",
+				Name:    "prefix",
+				Type:    "string",
+				Help:    "This is the input string for prefix based backup-restore",
+				Title:   "Prefix",
+				Example: "starkandwayne/",
 			},
 		},
 	}
@@ -122,6 +135,7 @@ type EtcdConfig struct {
 	ClientKeyPath  string
 	CaCertPath     string
 	FullOverride   bool
+	Prefix         string
 }
 
 func (p EtcdPlugin) Meta() plugin.PluginInfo {
@@ -149,21 +163,26 @@ func getEtcdConfig(endpoint plugin.ShieldEndpoint) (*EtcdConfig, error) {
 		return nil, err
 	}
 
-	clientCert, err := endpoint.StringValueDefault("clientCertFile", "")
+	clientCert, err := endpoint.StringValueDefault("clientCertPath", "")
 	if err != nil {
 		return nil, err
 	}
 
-	clientKey, err := endpoint.StringValueDefault("clientKeyFile", "")
+	clientKey, err := endpoint.StringValueDefault("clientKeyPath", "")
 	if err != nil {
 		return nil, err
 	}
-	caCert, err := endpoint.StringValueDefault("caCertFile", "")
+	caCert, err := endpoint.StringValueDefault("caCertPath", "")
 	if err != nil {
 		return nil, err
 	}
 
 	fullOverride, err := endpoint.BooleanValueDefault("fullOverride", false)
+	if err != nil {
+		return nil, err
+	}
+
+	prefix, err := endpoint.StringValueDefault("prefix", "")
 	if err != nil {
 		return nil, err
 	}
@@ -177,6 +196,7 @@ func getEtcdConfig(endpoint plugin.ShieldEndpoint) (*EtcdConfig, error) {
 		ClientKeyPath:  clientKey,
 		CaCertPath:     caCert,
 		FullOverride:   fullOverride,
+		Prefix:         prefix,
 	}, nil
 }
 
@@ -221,12 +241,12 @@ func (p EtcdPlugin) Validate(endpoint plugin.ShieldEndpoint) error {
 			fmt.Printf("@R{\u2717 pass  %s}\n", err)
 			fail = true
 		} else if s == "" {
-			fmt.Printf("@R{\u2717 pass} password was not provided so cert based auth will be used\n")
+			fmt.Printf("@R{\u2713 pass} password was not provided so cert based auth will be used\n")
 		} else {
 			fmt.Printf("@G{\u2713 password} @C{%s}\n", plugin.Redact(s))
 		}
 
-		s, err = endpoint.StringValueDefault("clientCertFile", "")
+		s, err = endpoint.StringValueDefault("clientCertPath", "")
 		if err != nil {
 			fmt.Printf("@R{\u2717 client certificate path  %s}\n", err)
 		} else if s == "" {
@@ -236,7 +256,7 @@ func (p EtcdPlugin) Validate(endpoint plugin.ShieldEndpoint) error {
 			fmt.Printf("@G{\u2713 pass} client certificate path was provided\n")
 		}
 
-		s, err = endpoint.StringValueDefault("clientKeyFile", "")
+		s, err = endpoint.StringValueDefault("clientKeyPath", "")
 		if err != nil {
 			fmt.Printf("@R{\u2717 client key path  %s}\n", err)
 		} else if s == "" {
@@ -246,7 +266,7 @@ func (p EtcdPlugin) Validate(endpoint plugin.ShieldEndpoint) error {
 			fmt.Printf("@G{\u2713 pass} client key path was provided\n")
 		}
 
-		s, err = endpoint.StringValueDefault("caCertFile", "")
+		s, err = endpoint.StringValueDefault("caCertPath", "")
 		if err != nil {
 			fmt.Printf("@R{\u2717 CA certificate path  %s}\n", err)
 		} else if s == "" {
@@ -265,6 +285,16 @@ func (p EtcdPlugin) Validate(endpoint plugin.ShieldEndpoint) error {
 		fmt.Printf("@G{\u2713} full restore enabled\n")
 	} else {
 		fmt.Printf("@G{\u2713} full restore disabled\n")
+	}
+
+	s, err = endpoint.StringValueDefault("prefix", "")
+	if err != nil {
+		fmt.Printf("@R{\u2717 prefix  %s}\n", err)
+		fail = true
+	} else if s == "" {
+		fmt.Printf("@R{\u2713 prefix} prefix was not provided so everything will be backed-up/restored\n")
+	} else {
+		fmt.Printf("@G{\u2713 prefix} @C{%s}\n", plugin.Redact(s))
 	}
 
 	if fail {
@@ -292,6 +322,7 @@ func (p EtcdPlugin) Backup(endpoint plugin.ShieldEndpoint) error {
 		log.Fatal(err)
 	}
 
+	ctx, cancel := context.WithTimeout(context.Background(), 2*time.Second)
 	cli, err := clientv3.New(clientv3.Config{
 		Endpoints:   []string{etcd.EtcdEndpoints},
 		DialTimeout: 2 * time.Second,
@@ -303,11 +334,12 @@ func (p EtcdPlugin) Backup(endpoint plugin.ShieldEndpoint) error {
 	if err != nil {
 		log.Fatal(err)
 	}
-	defer cli.Close()
 
-	ctx, cancel := context.WithTimeout(context.Background(), 2*time.Second)
-	resp, err := cli.Get(ctx, "", clientv3.WithPrefix(), clientv3.WithSort(clientv3.SortByKey, clientv3.SortDescend))
-	cancel()
+	defer cli.Close()
+	defer cancel()
+
+	resp, err := cli.Get(ctx, etcd.Prefix, clientv3.WithPrefix(), clientv3.WithSort(clientv3.SortByKey, clientv3.SortDescend))
+
 	if err != nil {
 		log.Fatal(err)
 	}
