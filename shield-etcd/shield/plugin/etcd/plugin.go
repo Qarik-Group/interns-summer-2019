@@ -36,7 +36,7 @@ func main() {
 			"clientCertPath" : "/tmp/test-certs/test-client.crt" 		# path to client certificate
 			"clientKeyPath"  : "/tmp/test-certs/test-client-key.key" 	# path to client key
 			"caCertPath"     : "/tmp/test-certs/test-ca.crt" 			# path to CA certificate
-			"fullOverride" 	 : "false"									# enable or disable full override of the cluster
+			"fullOverwrite" 	 : "false"									# enable or disable full overwrite of the cluster
 			"prefix"		 : "starkandwayne/"							# backup specific keys
 			}
 			`,
@@ -104,10 +104,10 @@ func main() {
 			},
 			plugin.Field{
 				Mode:    "target",
-				Name:    "fullOverride",
+				Name:    "fullOverwrite",
 				Type:    "bool",
-				Help:    "If this is enabled, the key/value pairs will be fully overridden",
-				Title:   "Full Override",
+				Help:    "If this is enabled, the existing key/value pairs will be deleted. The values will be restored using the backup archive.",
+				Title:   "Full Overwrite",
 				Example: "false",
 			},
 			plugin.Field{
@@ -134,7 +134,7 @@ type EtcdConfig struct {
 	ClientCertPath string
 	ClientKeyPath  string
 	CaCertPath     string
-	FullOverride   bool
+	FullOverwrite   bool
 	Prefix         string
 }
 
@@ -177,7 +177,7 @@ func getEtcdConfig(endpoint plugin.ShieldEndpoint) (*EtcdConfig, error) {
 		return nil, err
 	}
 
-	fullOverride, err := endpoint.BooleanValueDefault("fullOverride", false)
+	fullOverwrite, err := endpoint.BooleanValueDefault("fullOverwrite", false)
 	if err != nil {
 		return nil, err
 	}
@@ -195,7 +195,7 @@ func getEtcdConfig(endpoint plugin.ShieldEndpoint) (*EtcdConfig, error) {
 		ClientCertPath: clientCert,
 		ClientKeyPath:  clientKey,
 		CaCertPath:     caCert,
-		FullOverride:   fullOverride,
+		FullOverwrite:   fullOverwrite,
 		Prefix:         prefix,
 	}, nil
 }
@@ -277,7 +277,7 @@ func (p EtcdPlugin) Validate(endpoint plugin.ShieldEndpoint) error {
 		}
 	}
 
-	b, err = endpoint.BooleanValueDefault("fullOverride", false)
+	b, err = endpoint.BooleanValueDefault("fullOverwrite", false)
 	if err != nil {
 		fmt.Printf("@R{\u2717 full restore  %s}\n", err)
 		fail = true
@@ -384,7 +384,7 @@ func (p EtcdPlugin) Restore(endpoint plugin.ShieldEndpoint) error {
 	}
 	defer cli.Close()
 
-	if etcd.FullOverride {
+	if etcd.FullOverwrite {
 		ctx, cancel := context.WithTimeout(context.Background(), 2*time.Second)
 		_, err := cli.Delete(ctx, "", clientv3.WithPrefix())
 		if err != nil {

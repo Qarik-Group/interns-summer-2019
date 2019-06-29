@@ -14,7 +14,7 @@ services:
           - ${ETCD_DATA}:/etcd1-data
         environment:
             ETCD_NAME: etcd1
-            ETCD_DATA_DIR: /etcd1-data/etcd1.etcd
+            ETCD_DATA_DIR: /etcd1-data/etcd1.etcd 
             ETCDCTL_API: 3
             ETCD_INITIAL_ADVERTISE_PEER_URLS: https://etcd1:2380
             ETCD_INITIAL_CLUSTER: etcd1=https://etcd1:2380,etcd2=https://etcd2:2380,etcd3=https://etcd3:2380
@@ -43,7 +43,7 @@ services:
           - ${ETCD_DATA}:/etcd2-data
         environment:
             ETCD_NAME: etcd2
-            ETCD_DATA_DIR: /etcd2-data/etcd2.etcd
+            ETCD_DATA_DIR: /etcd2-data/etcd2.etcd 
             ETCDCTL_API: 3
             ETCD_INITIAL_ADVERTISE_PEER_URLS: https://etcd2:2380
             ETCD_INITIAL_CLUSTER: etcd1=https://etcd1:2380,etcd2=https://etcd2:2380,etcd3=https://etcd3:2380
