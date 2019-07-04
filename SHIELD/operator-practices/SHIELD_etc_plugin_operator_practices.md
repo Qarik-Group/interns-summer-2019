@@ -29,7 +29,7 @@ After this, move one level up into go/src/github.com/shieldproject/shield and ed
 
 We know this is not the best way to go about it. That's why, work is being done to package this as ready-to-install. 
 
-Once this is done, do a make clean && make shield dev. You'll land at the tmux. This is the SHIELD testdev environment. To access it, open up [http://localhost:8181]() in your web browser.
+Once this is done, do a `make clean && make shield dev`. You'll land at the tmux. This is the SHIELD testdev environment. To access it, open up [http://localhost:8181]() in your web browser.
 
 ![](3.png)
 
