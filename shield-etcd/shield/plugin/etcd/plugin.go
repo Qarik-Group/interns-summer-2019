@@ -134,7 +134,7 @@ type EtcdConfig struct {
 	ClientCertPath string
 	ClientKeyPath  string
 	CaCertPath     string
-	FullOverwrite   bool
+	FullOverwrite  bool
 	Prefix         string
 }
 
@@ -195,7 +195,7 @@ func getEtcdConfig(endpoint plugin.ShieldEndpoint) (*EtcdConfig, error) {
 		ClientCertPath: clientCert,
 		ClientKeyPath:  clientKey,
 		CaCertPath:     caCert,
-		FullOverwrite:   fullOverwrite,
+		FullOverwrite:  fullOverwrite,
 		Prefix:         prefix,
 	}, nil
 }
@@ -250,30 +250,27 @@ func (p EtcdPlugin) Validate(endpoint plugin.ShieldEndpoint) error {
 		if err != nil {
 			fmt.Printf("@R{\u2717 client certificate path  %s}\n", err)
 		} else if s == "" {
-			fmt.Printf("@R{\u2717 pass} auth was enabled but client cert was not provided\n")
-			fail = true
+			fmt.Printf("@R{\u2713 client certificate path} was not provided\n")
 		} else {
-			fmt.Printf("@G{\u2713 pass} client certificate path was provided\n")
+			fmt.Printf("@G{\u2713 client certificate path} was provided\n")
 		}
 
 		s, err = endpoint.StringValueDefault("clientKeyPath", "")
 		if err != nil {
 			fmt.Printf("@R{\u2717 client key path  %s}\n", err)
 		} else if s == "" {
-			fmt.Printf("@R{\u2717 pass} auth was enabled but client key was not provided\n")
-			fail = true
+			fmt.Printf("@R{\u2713 client key path} was not provided\n")
 		} else {
-			fmt.Printf("@G{\u2713 pass} client key path was provided\n")
+			fmt.Printf("@G{\u2713 client key path} was provided\n")
 		}
 
 		s, err = endpoint.StringValueDefault("caCertPath", "")
 		if err != nil {
 			fmt.Printf("@R{\u2717 CA certificate path  %s}\n", err)
 		} else if s == "" {
-			fmt.Printf("@R{\u2717 pass} auth was enabled but CA certificate path was not provided\n")
-			fail = true
+			fmt.Printf("@R{\u2713 CA certificate path} was not provided\n")
 		} else {
-			fmt.Printf("@G{\u2713 pass} CA certificate path was provided\n")
+			fmt.Printf("@G{\u2713 CA certificate path} was provided\n")
 		}
 	}
 
@@ -404,9 +401,14 @@ func (p EtcdPlugin) Restore(endpoint plugin.ShieldEndpoint) error {
 		strval := a[1]
 
 		datakey, err := base64.StdEncoding.DecodeString(strkey)
+		if err != nil {
+			fmt.Printf("error decoding key: %s", err)
+			return err
+		}
+
 		dataval, err := base64.StdEncoding.DecodeString(strval)
 		if err != nil {
-			fmt.Printf("error: %s", err)
+			fmt.Printf("error decoding value: %s", err)
 			return err
 		}
 
