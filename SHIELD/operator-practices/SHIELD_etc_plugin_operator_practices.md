@@ -1,9 +1,9 @@
-#Operator practices for using the SHIELD etcd plugin
+# Operator practices for using the SHIELD etcd plugin
 
 
 We have successfully implemented the base plugin for implementing the validate, backup and restore functions of the etcd plugin. This document will walk you through on different types of functionalities we support coupled with our backup and restore functions. 
 
-##Plugin usage
+## Plugin usage
 
 To be able to use the plugin, we suggest the following method:
 
@@ -95,7 +95,7 @@ As shown above, the restore completed successfully. Let's head to our etcd clust
 
 The image above shows the successful restore. The command when first executed was before the restore job. 
 
-##Backup and restore with auth enabled
+## Backup and restore with auth enabled
 
 We can `exec` into one of the running etcd containers to enable role based authentication and then issue the following commands to set things up.
 
@@ -146,7 +146,7 @@ Get back to SHIELD and restore using the archive we just created.
 
 All looks okay. You can switch back to the etcd cluster and see that the deleted keys got successfully restored. 
 
-##Backup and restore on a secure etcd cluster (Cert-based auth)
+## Backup and restore on a secure etcd cluster (Cert-based auth)
 
 In this section of the document, we'll enable certificate based authentication. 
 
@@ -191,7 +191,7 @@ Let's log into the cluster and check if the keys reappeared.
 
 ![](45.png)
 
-##Backing up with a prefix
+## Backing up with a prefix
 
 You can also leverage the option of backing up keys with a specific prefix. This can be extremely useful in restoration of any keys which would have been corrupted over the time. Let's spin up a non auth etcd cluster and add some keys which have the prefix `starkandwayne`. 
 
