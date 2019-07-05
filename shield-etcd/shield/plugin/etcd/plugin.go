@@ -400,12 +400,23 @@ func (p EtcdPlugin) Restore(endpoint plugin.ShieldEndpoint) error {
 	}
 
 	for {
-		line, _, err := reader.ReadLine()
+		line, buffer, err := reader.ReadLine()
 		if err == io.EOF {
 			break
 		}
 
-		a := strings.Split(string(line), " : ")
+		lineBuffer := []byte{}
+		lineBuffer = append(lineBuffer, line...)
+		for buffer {
+			partLine := []byte{}
+			partLine, buffer, err = reader.ReadLine()
+			if err == io.EOF {
+				break
+			}
+			lineBuffer = append(lineBuffer, partLine...)
+		}
+
+		a := strings.Split(string(lineBuffer), " : ")
 		strkey := a[0]
 		strval := a[1]
 
