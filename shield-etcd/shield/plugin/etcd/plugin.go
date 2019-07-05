@@ -382,12 +382,21 @@ func (p EtcdPlugin) Restore(endpoint plugin.ShieldEndpoint) error {
 	defer cli.Close()
 
 	if etcd.FullOverwrite {
-		ctx, cancel := context.WithTimeout(context.Background(), 2*time.Second)
-		_, err := cli.Delete(ctx, "", clientv3.WithPrefix())
-		if err != nil {
-			log.Fatal(err)
+		if etcd.Prefix == "" {
+			ctx, cancel := context.WithTimeout(context.Background(), 2*time.Second)
+			_, err := cli.Delete(ctx, "", clientv3.WithPrefix())
+			if err != nil {
+				log.Fatal(err)
+			}
+			defer cancel()
+		} else {
+			ctx, cancel := context.WithTimeout(context.Background(), 2*time.Second)
+			_, err := cli.Delete(ctx, etcd.Prefix, clientv3.WithPrefix())
+			if err != nil {
+				log.Fatal(err)
+			}
+			defer cancel()
 		}
-		defer cancel()
 	}
 
 	for {
