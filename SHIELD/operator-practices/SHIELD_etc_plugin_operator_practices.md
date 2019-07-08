@@ -207,6 +207,39 @@ Let's define a new data system with the prefix option enabled. Specify `starkand
 
 So, after restore we get all our prefixed keys back.
 
+## Leveraging Full Overwrite option
+
+You can use the Full Overwrite option to wipe out the keys and values in an etcd cluster and replace them with an earlier backup. The following will walk you through this process.
+
+Let's put in some keys in our etcd cluster.
+
+![](52.png)
+
+Now, run the backup job with Full overwrite option enabled. This basically takes a backup and then deletes whatever is in the cluster at the time of restore. 
+
+![](53.png)
+
+As we see below, the backup job was completed successfully.
+
+![](54.png)
+
+Now, let's go ahead and delete the values we have right now. Also, we'll be replacing them with other values to test the `full overwrite` option. 
+
+![](55.png)
+
+Once this is done, let's go ahead and run the restore job. 
+
+![](56.png)
+![](57.png)
+![](58.png)
+![](59.png)
+
+As shown above, the restore job ran successfully. Let's get back to the etcd cluster and check if our keys and values reappeared.
+
+![](60.png)
+
+As expected, we deleted the existing keys and values from the cluster. The etcd cluster was restored using an earlier backup archive. 
+
 
 
 
