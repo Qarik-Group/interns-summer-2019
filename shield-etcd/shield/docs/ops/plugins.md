@@ -600,6 +600,32 @@ Then add the job to install `bbr`:
 
 Check the [add-on's README][shield-bbr] for more information.
 
+### ETCD Backup / Restore
+
+The`ETCD` plugin lets you back up a ETCD key-value store. It works by walking the entire store and capturing the value of every key. If desired, only certain prefixed key/value pairs can be backup up.
+
+On restore, keys from the backup archive will be put back into the running key-value store. The plugin by default appends keys and values, but there is an option to clean restore the ETCD cluster.
+
+##### Configuration Options
+
+- `endpoints` **(required)** - The IP address or host name of one of your ETCD nodes.
+
+- `auth` - Needs to be enabled if your ETCD cluster uses role-based authentication or TLS/SSL certificates.
+
+- `user` - Username to access the ETCD cluster
+
+- `pass` - Password to access the ETCD cluster
+
+- `clientCertPath` - Path to X.509 client certificate
+
+- `clientKeyPath` - Path to X.509 client key
+
+- `caCertPath` - Path to X.509 CA certificate
+
+- `fullOverwrite` - When restoring the cluster, it deleted the current keys and values and then restores keys and values from the backup.
+
+- `prefix` - Backup specific keys
+
 
 
 Storage Plugins
