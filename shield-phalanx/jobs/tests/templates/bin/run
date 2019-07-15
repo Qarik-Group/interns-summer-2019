@@ -1,0 +1,109 @@
+#!/bin/bash
+set -eu
+exec 2>&1
+test -z "${ERRAND_DEBUG:-<% if p('debug') %>1<% end %>}" || set -x
+
+export TARGET="<%= link('shield').instances[0].address %>"
+export TMP=/var/vcap/sys/tmp ; mkdir -p $TMP
+for pkg in consul mariadb mongodb postgres shield jq s3; do
+  export PATH=$PATH:/var/vcap/packages/$pkg/bin
+done
+
+echo "################################################################"
+echo "#"
+echo "# SHIELD at <%= link('shield').instances[0].address %>"
+echo "#"
+echo "################################################################"
+echo
+
+export S3_AKI="<%= p('aws.access_key') %>"
+export S3_KEY="<%= p('aws.secret_key') %>"
+# configure AWS # {{{
+export S3_BUCKET=$(dd if=/dev/urandom bs=1 count=32 2>/dev/null | sha1sum | awk '{print $1}')-phalanx
+echo "CREATING NEW AWS BUCKET '$S3_BUCKET'"
+echo "> Creating AWS bucket '$S3_BUCKET'"
+s3 create-bucket $S3_BUCKET
+echo
+# }}}
+# configure SHIELD # {{{
+echo "CONFIGURING SHIELD AT <%= link('shield').instances[0].address %>"
+echo "> Targeting backend at <%= link('shield').instances[0].address %>"
+
+shield api test http://<%= link('shield').instances[0].address %>:8080
+export SHIELD_CORE=test
+export SHIELD_TENANT="Default Tenant"
+
+(export SHIELD_CORE_MASTER=sekrit
+ shield init || shield unlock)
+
+shield login -u smoke -p tests
+SHIELD_AUTH_TOKEN=$(shield create-auth-token t$(date +"%Y%m%d%H%M%S"))
+export SHIELD_AUTH_TOKEN
+
+cat <<EOF | shield import -
+core: http://<%= link('shield').instances[0].address %>:8080
+token: $SHIELD_AUTH_TOKEN
+
+tenants:
+  - name: Default Tenant
+
+    storage:
+      - name: s3
+        plugin: s3
+        agent: 127.0.0.1:5444
+        config:
+          access_key_id:     $S3_AKI
+          secret_access_key: $S3_KEY
+          bucket:            $S3_BUCKET
+          prefix:            ph/al/an/x
+EOF
+# }}}
+# run TESTS {{{
+echo "RUNNING TARGET TESTS"
+failed=0
+rm -f $TMP/FAILURE $TMP/SUCCESS
+for run in /var/vcap/jobs/tests/tests/*; do
+	job=${run##*/}
+	chmod 0755 $run
+	if ! $run $*; then
+		failed=$(( failed + 1 ))
+		echo "$job failed" | tr a-z A-Z
+		echo "- $job failed" >>$TMP/FAILURE
+	else
+		echo
+		echo "$job succeeded" | tr a-z A-Z
+		echo "- $job OK" >>$TMP/SUCCESS
+		echo
+	fi
+done
+echo
+# }}}
+# teardown AWS # {{{
+echo
+echo "CLEANING UP AWS BUCKET '$S3_BUCKET'"
+echo "> Removing AWS bucket '$S3_BUCKET' (and all of its files)"
+s3 delete-bucket -R $S3_BUCKET
+# }}}
+
+
+echo
+echo
+echo "DONE"
+if [[ $failed -eq 0 ]]; then
+	echo "ALL TESTS PASSED"
+	echo "----------------------------------"
+	cat $TMP/SUCCESS
+	echo "----------------------------------"
+	echo
+	echo "SHIELD IS OKAY TO RELEASE"
+	exit 0
+else
+	echo "$failed TEST(S) FAILED!"
+	echo "----------------------------------"
+	cat $TMP/FAILURE
+	echo "----------------------------------"
+	echo
+	echo "SHIELD CANNOT BE RELEASED UNTIL THIS IS FIXED"
+	exit 1
+fi
+# vim:ft=bash

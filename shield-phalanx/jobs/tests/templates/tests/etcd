@@ -1,0 +1,15 @@
+#!/bin/bash
+source /var/vcap/jobs/tests/lib/functions etcd
+
+runTests() {
+	echo "Setting up test data"
+	/var/vcap/jobs/targets/bin/etcdctl put foo bar
+
+	if [[ $(var/vcap/jobs/targets/bin/etcdctl get foo) != "bar" ]]; then
+		echo "!! foo key was not initialized properly"
+	else
+		echo "Test Passed!"
+	fi
+}
+
+runTests

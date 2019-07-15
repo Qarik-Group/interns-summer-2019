@@ -1,0 +1,35 @@
+---
+name: targets
+packages:
+  - consul
+  - certifier
+  - etcd
+  - mariadb
+  - mongodb
+  - postgres
+  - vault-latest
+
+templates:
+  bin/consul:     bin/consul
+  bin/etcd:       bin/etcd
+  bin/mariadb:    bin/mariadb
+  bin/mongodb:    bin/mongodb
+  bin/postgres:   bin/postgres
+  bin/vault:      bin/vault
+
+  config/consul/consul.conf: config/consul/consul.conf
+
+  config/postgres/hba.conf: config/postgres/hba.conf
+
+  config/mariadb/my.cnf: config/mariadb/my.cnf
+  config/mariadb/init:   config/mariadb/init
+
+  config/vault/vault.conf: config/vault/vault.conf
+
+  helpers/utils: helpers/utils
+
+provides:
+  - name: target
+    type: target
+
+properties: {}

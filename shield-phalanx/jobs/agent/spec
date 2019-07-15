@@ -1,0 +1,16 @@
+---
+name: agent
+packages:
+  - shield
+  - bsdtar
+
+templates:
+  bin/agent:         bin/agent
+  config/agent.conf: config/agent.conf
+  helpers/utils:     helpers/utils
+
+consumes:
+  - name: shield
+    type: shield
+
+properties: {}

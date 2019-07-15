@@ -1,0 +1,84 @@
+#!/bin/bash
+source /var/vcap/jobs/tests/lib/functions mongodb
+
+mongo() {
+	command mongo --quiet mongodb://$TARGET "$@"
+}
+
+rc=0
+cat <<EOF
+
+
+##     ##  #######  ##    ##  ######    #######
+###   ### ##     ## ###   ## ##    ##  ##     ##
+#### #### ##     ## ####  ## ##        ##     ##
+## ### ## ##     ## ## ## ## ##   #### ##     ##
+##     ## ##     ## ##  #### ##    ##  ##     ##
+##     ## ##     ## ##   ### ##    ##  ##     ##
+##     ##  #######  ##    ##  ######    #######
+
+
+EOF
+echo ">> configuring SHIELD"
+cat <<EOF | shield import -
+core:  http://<%= link('shield').instances[0].address %>:8080
+token: $SHIELD_AUTH_TOKEN
+
+tenants:
+  - name: Default Tenant
+
+    systems:
+      - name:   mongodb-all
+        plugin: mongo
+        agent:  $TARGET:5444
+        config: {}
+        jobs:
+          - name:    mongodb-all-daily
+            when:    daily 4am
+            retain:  2d
+            storage: s3
+            paused:  yes
+EOF
+echo
+
+echo ">> setting up test data"
+mongo $ROOT/init
+mongo --eval 'db.collection.find({})' >$TMP/db.dat
+echo "   initial contents of the database:"
+sed -e 's/^/    /' <$TMP/db.dat
+echo
+
+echo ">> running backup job"
+wait_for_task $(shield run-job mongodb-all-daily | jq -r '.task_uuid')
+echo
+
+if ! check_encryption mongodb-all; then
+    rc=1
+fi
+
+echo ">> trashing the data"
+echo "   deleting all of the data out of 'db'"
+mongo --eval 'db.collection.deleteMany({})'
+echo "   contents of the database are now:"
+mongo --eval 'db.collection.find({})' | sed -e 's/^/    /'
+echo
+
+echo ">> restoring from backups"
+wait_for_task $(restore_latest mongodb-all)
+echo
+
+echo ">> verifying data, post-restore"
+echo "   contents of 'db':"
+mongo --eval 'db.collection.find({})' | sed -e 's/^/    /'
+
+mongo --eval 'db.collection.find({})' >$TMP/db.post
+
+if ! diff -u $TMP/db.dat $TMP/db.post &>/dev/null; then
+	echo "!! db was not properly restored!"
+	echo
+	diff -u $TMP/db.dat $TMP/db.post || true
+	echo
+	rc=1
+fi
+
+exit $rc
