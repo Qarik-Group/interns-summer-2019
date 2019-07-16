@@ -1,14 +1,16 @@
 #!/bin/bash
 source /var/vcap/jobs/tests/lib/functions etcd
 
+#Adding keys and values
 addKeyVals() {
 	echo "Putting three keys..."
 	./etcdctl --endpoints=http://$TARGET:2379 put foo bar
 	./etcdctl --endpoints=http://$TARGET:2379 put pokemon psyduck
 	./etcdctl --endpoints=http://$TARGET:2379 put avengers endgame
-	echo ""
+	echo
 }
 
+#Getting values from keys
 verifyVals() {
 	if [[ $(./etcdctl --endpoints=http://$TARGET:2379 get foo --print-value-only) != "bar" ]]; then
 		echo "!! foo key was not initialized properly"
@@ -30,14 +32,74 @@ verifyVals() {
 }
 
 runTests() {
+	local target=$1
+	local rc=0
+
 	cd /var/vcap/packages/etcd/bin/
 	export ETCDCTL_API=3
 
 	echo -e "Setting up test data\n"
 	addKeyVals
 
+	echo ">> running backup job"
+	wait_for_task $(shield run-job ${target}-daily | jq -r '.task_uuid')
+	echo
+
+	echo ">> trashing the data"
+	./etcdctl --endpoints=http://$TARGET:2379 put pokemon ditto
+	./etcdctl --endpoints=http://$TARGET:2379 del foo
+
+    if ! check_encryption ${target}; then
+        rc=1
+    fi
+
+	echo ">> restoring from backups"
+	wait_for_task $(restore_latest ${target})
+	echo
+
 	echo "Verifying test data"
 	verifyVals
+	return $rc;
 }
 
-runTests
+rc=0
+cat <<EOF
+
+
+###### ########  ###### ######
+#         #     #       #     #
+#         #    #        #      #
+#####     #    #        #       #
+#         #    #        #      #
+#         #     #       #     #
+######    #      ###### #####
+
+
+EOF
+
+echo ">> configuring SHIELD"
+cat <<EOF | shield import -
+core:  http://<%= link('shield').instances[0].address %>:8080
+token: $SHIELD_AUTH_TOKEN
+
+tenants:
+  - name: Default Tenant
+
+    systems:
+      - name:   etcd-notls
+        plugin: etcd
+        agent:  $TARGET:5444
+        config:
+          endpoints:                http://$TARGET:2379
+        jobs:
+          - name:    etcd-notls-daily
+            when:    daily 4am
+            retain:  2d
+            storage: s3
+            paused:  yes
+EOF
+
+runTests etcd-notls
+rc=$(($rc + $?))
+
+exit $rc
