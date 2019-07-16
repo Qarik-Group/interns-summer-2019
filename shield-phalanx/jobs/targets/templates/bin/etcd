@@ -3,6 +3,7 @@ set -eu
 source /var/vcap/jobs/targets/helpers/utils targets etcd
 export LANG=en_US.UTF-8
 
+
 case $1 in
   start)
     echo "[$(date)] $TARGET phalanx target starting up (pid $$)..."
@@ -10,7 +11,7 @@ case $1 in
     echo $$ > $PIDFILE
 
     echo "[$(date)] $TARGET phalanx target exec'ing..."
-    exec chpst -u vcap:vcap etcd --data-dir=/var/vcap/store/targets/etcd/
+    exec chpst -u vcap:vcap etcd --data-dir=/var/vcap/store/targets/etcd/ --listen-client-urls=http://0.0.0.0:2379 --advertise-client-urls=http://0.0.0.0:2379
     ;;
 
   stop)

@@ -33,4 +33,3 @@ check process vault
   start program "/var/vcap/jobs/targets/bin/vault start"
   stop program  "/var/vcap/jobs/targets/bin/vault stop"
   group vcap
-

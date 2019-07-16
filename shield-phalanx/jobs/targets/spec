@@ -11,8 +11,8 @@ packages:
 
 templates:
   bin/consul:     bin/consul
-  bin/etcd:       bin/etcd
   bin/mariadb:    bin/mariadb
+  bin/etcd:       bin/etcd
   bin/mongodb:    bin/mongodb
   bin/postgres:   bin/postgres
   bin/vault:      bin/vault

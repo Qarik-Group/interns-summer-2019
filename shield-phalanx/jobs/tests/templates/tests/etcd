@@ -1,15 +1,43 @@
 #!/bin/bash
 source /var/vcap/jobs/tests/lib/functions etcd
 
-runTests() {
-	echo "Setting up test data"
-	/var/vcap/jobs/targets/bin/etcdctl put foo bar
+addKeyVals() {
+	echo "Putting three keys..."
+	./etcdctl --endpoints=http://$TARGET:2379 put foo bar
+	./etcdctl --endpoints=http://$TARGET:2379 put pokemon psyduck
+	./etcdctl --endpoints=http://$TARGET:2379 put avengers endgame
+	echo ""
+}
 
-	if [[ $(var/vcap/jobs/targets/bin/etcdctl get foo) != "bar" ]]; then
+verifyVals() {
+	if [[ $(./etcdctl --endpoints=http://$TARGET:2379 get foo --print-value-only) != "bar" ]]; then
 		echo "!! foo key was not initialized properly"
 	else
-		echo "Test Passed!"
+		echo "Got correct value for key foo"
 	fi
+
+	if [[ $(./etcdctl --endpoints=http://$TARGET:2379 get pokemon --print-value-only) != "psyduck" ]]; then
+		echo "!! pokemon key was not initialized properly"
+	else
+		echo "Got correct value for key pokemon"
+	fi
+
+	if [[ $(./etcdctl --endpoints=http://$TARGET:2379 get avengers --print-value-only) != "endgame" ]]; then
+		echo "!! avengers key was not initialized properly"
+	else
+		echo "Got correct value for key avengers"
+	fi
+}
+
+runTests() {
+	cd /var/vcap/packages/etcd/bin/
+	export ETCDCTL_API=3
+
+	echo -e "Setting up test data\n"
+	addKeyVals
+
+	echo "Verifying test data"
+	verifyVals
 }
 
 runTests
