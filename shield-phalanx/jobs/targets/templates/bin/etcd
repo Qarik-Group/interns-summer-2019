@@ -11,7 +11,10 @@ case $1 in
     echo $$ > $PIDFILE
 
     echo "[$(date)] $TARGET phalanx target exec'ing..."
-    exec chpst -u vcap:vcap etcd --data-dir=/var/vcap/store/targets/etcd/ --listen-client-urls=http://0.0.0.0:2379 --advertise-client-urls=http://0.0.0.0:2379
+    echo "ETCD without tls starting..."
+    exec chpst -u vcap:vcap etcd --data-dir=/var/vcap/store/targets/etcd/ \
+      --listen-client-urls=http://0.0.0.0:2379 \
+      --advertise-client-urls=http://0.0.0.0:2379
     ;;
 
   stop)

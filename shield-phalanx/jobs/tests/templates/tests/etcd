@@ -3,28 +3,30 @@ source /var/vcap/jobs/tests/lib/functions etcd
 
 #Adding keys and values
 addKeyVals() {
+	local url=$1
 	echo "Putting three keys..."
-	./etcdctl --endpoints=http://$TARGET:2379 put foo bar
-	./etcdctl --endpoints=http://$TARGET:2379 put pokemon psyduck
-	./etcdctl --endpoints=http://$TARGET:2379 put avengers endgame
+	./etcdctl  --endpoints=$url put foo bar
+	./etcdctl  --endpoints=$url put pokemon psyduck
+	./etcdctl  --endpoints=$url put avengers endgame
 	echo
 }
 
 #Getting values from keys
 verifyVals() {
-	if [[ $(./etcdctl --endpoints=http://$TARGET:2379 get foo --print-value-only) != "bar" ]]; then
+	local url=$1
+	if [[ $(./etcdctl  --endpoints=$url get foo --print-value-only) != "bar" ]]; then
 		echo "!! foo key was not initialized properly"
 	else
 		echo "Got correct value for key foo"
 	fi
 
-	if [[ $(./etcdctl --endpoints=http://$TARGET:2379 get pokemon --print-value-only) != "psyduck" ]]; then
+	if [[ $(./etcdctl  --endpoints=$url get pokemon --print-value-only) != "psyduck" ]]; then
 		echo "!! pokemon key was not initialized properly"
 	else
 		echo "Got correct value for key pokemon"
 	fi
 
-	if [[ $(./etcdctl --endpoints=http://$TARGET:2379 get avengers --print-value-only) != "endgame" ]]; then
+	if [[ $(./etcdctl  --endpoints=$url get avengers --print-value-only) != "endgame" ]]; then
 		echo "!! avengers key was not initialized properly"
 	else
 		echo "Got correct value for key avengers"
@@ -33,21 +35,22 @@ verifyVals() {
 
 runTests() {
 	local target=$1
+	local url=$2
 	local rc=0
 
 	cd /var/vcap/packages/etcd/bin/
 	export ETCDCTL_API=3
 
 	echo -e "Setting up test data\n"
-	addKeyVals
+	addKeyVals $url
 
 	echo ">> running backup job"
 	wait_for_task $(shield run-job ${target}-daily | jq -r '.task_uuid')
 	echo
 
 	echo ">> trashing the data"
-	./etcdctl --endpoints=http://$TARGET:2379 put pokemon ditto
-	./etcdctl --endpoints=http://$TARGET:2379 del foo
+	./etcdctl  --endpoints=$url put pokemon ditto
+	./etcdctl  --endpoints=$url del foo
 
     if ! check_encryption ${target}; then
         rc=1
@@ -58,7 +61,7 @@ runTests() {
 	echo
 
 	echo "Verifying test data"
-	verifyVals
+	verifyVals $url
 	return $rc;
 }
 
@@ -91,6 +94,7 @@ tenants:
         agent:  $TARGET:5444
         config:
           endpoints:                http://$TARGET:2379
+          overwrite:                true
         jobs:
           - name:    etcd-notls-daily
             when:    daily 4am
@@ -99,7 +103,8 @@ tenants:
             paused:  yes
 EOF
 
-runTests etcd-notls
-rc=$(($rc + $?))
+echo "Testing etcd without tls..."
+runTests etcd-notls http://$TARGET:2379
+rc=$?
 
 exit $rc
