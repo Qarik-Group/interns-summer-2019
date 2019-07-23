@@ -2,12 +2,17 @@
 name: tests
 packages:
   - etcd
+  - cfssl
   - shield
   - jq
   - s3
 
 templates:
   bin/run:                bin/run
+  bin/pre-start:          bin/pre-start
+
+  data/etcd-tls/tls/cert.pem:      data/etcd-tls/tls/cert.pem
+  data/etcd-tls/tls/key.pem:       data/etcd-tls/tls/key.pem
 
   lib/functions:          lib/functions
 

@@ -10,6 +10,12 @@ check process etcd
   stop program  "/var/vcap/jobs/targets/bin/etcd stop"
   group vcap
 
+check process etcd-tls
+  with pidfile /var/vcap/sys/run/targets/etcd-tls.pid
+  start program "/var/vcap/jobs/targets/bin/etcd-tls start"
+  stop program  "/var/vcap/jobs/targets/bin/etcd-tls stop"
+  group vcap
+
 check process mariadb
   with pidfile /var/vcap/sys/run/targets/mariadb.pid
   start program "/var/vcap/jobs/targets/bin/mariadb start"
