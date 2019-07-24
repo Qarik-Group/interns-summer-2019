@@ -47,8 +47,8 @@ instance_groups:
         release: shield-phalanx
         properties:
           aws:
-            access_key: AKIA4UPBSIRKHEF2FKVC
-            secret_key: 4kVwVCmR0ES1djd2+tJ03x9eq26cgdjRjC9nD8RZ+O5KEs+89YPSkezn/U8
+            access_key: 
+            secret_key: 
 
 variables:
   - name: tls-ca
