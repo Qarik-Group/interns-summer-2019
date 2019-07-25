@@ -3,7 +3,6 @@ set -eu
 source /var/vcap/jobs/targets/helpers/utils targets etcd-tls
 export LANG=en_US.UTF-8
 export PATH=$PATH:/var/vcap/packages/etcd/bin/
-CERTS_DIR=/var/vcap/data
 
 
 case $1 in
@@ -12,20 +11,12 @@ case $1 in
     pid_guard $PIDFILE $TARGET
     echo $$ > $PIDFILE
 
+    if [ -d "/var/vcap/store/targets/etcd-tls" ]; then
+      rm -r /var/vcap/store/targets/etcd-tls
+    fi
+
     echo "ETCD with tls starting..."
-    exec chpst -u vcap:vcap etcd --data-dir=/var/vcap/store/targets/etcd-tls/ \
-      --name=etcd-tls \
-      --listen-client-urls=https://0.0.0.0:2479 \
-      --advertise-client-urls=https://0.0.0.0:2479 \
-      --initial-advertise-peer-urls=http://127.0.0.1:2480 \
-      --listen-peer-urls=http://127.0.0.1:2480 \
-      --initial-cluster=etcd-tls=http://127.0.0.1:2480 \
-      --peer-cert-file=$CERTS_DIR/etcd/cert.pem \
-      --peer-key-file=$CERTS_DIR/etcd/key.pem \
-      --client-cert-auth=true \
-      --trusted-ca-file=/var/vcap/jobs/targets/config/etcd/tls/cert.pem \
-      --cert-file=$CERTS_DIR/etcd/cert.pem \
-      --key-file=$CERTS_DIR/etcd/key.pem
+    exec chpst -u vcap:vcap etcd --config-file=${JOB_DIR}/config/etcd/etcd-tls.conf.yml
     ;;
   stop)
     echo "[$(date)] $TARGET phalanx target shutting down..."

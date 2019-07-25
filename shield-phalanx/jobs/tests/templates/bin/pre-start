@@ -5,7 +5,7 @@ export LANG=en_US.UTF-8
 JOB=etcd-tls
 BIN=pre-start
 JOB_DIR=/var/vcap/jobs/tests/data/$JOB
-CERTS_DIR=/var/vcap/data
+CERTS_DIR=/var/vcap/data/targets
 TMP_DIR=/var/vcap/data/tmp/$JOB
 
 # put cfssl in our path

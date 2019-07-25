@@ -12,18 +12,20 @@ packages:
 
 templates:
   bin/consul:     bin/consul
-  bin/mariadb:    bin/mariadb
   bin/etcd:       bin/etcd
-  bin/pre-start:  bin/pre-start
   bin/etcd-tls:   bin/etcd-tls
+  bin/mariadb:    bin/mariadb
   bin/mongodb:    bin/mongodb
   bin/postgres:   bin/postgres
+  bin/pre-start:  bin/pre-start
   bin/vault:      bin/vault
+
+  config/consul/consul.conf: config/consul/consul.conf
 
   config/etcd/tls/cert.pem:   config/etcd/tls/cert.pem
   config/etcd/tls/key.pem:    config/etcd/tls/key.pem
-
-  config/consul/consul.conf: config/consul/consul.conf
+  config/etcd/etcd.conf.yml:  config/etcd/etcd.conf.yml
+  config/etcd/etcd-tls.conf.yml:  config/etcd/etcd-tls.conf.yml
 
   config/postgres/hba.conf: config/postgres/hba.conf
 

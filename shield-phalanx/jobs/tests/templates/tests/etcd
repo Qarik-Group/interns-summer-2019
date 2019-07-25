@@ -14,9 +14,9 @@ addKeyVals() {
 addKeyValsTls() {
     local url=$1
     echo "Putting three keys..."
-    etcdctl --cacert=/var/vcap/jobs/tests/data/etcd-tls/tls/cert.pem --key=/var/vcap/data/etcd/key.pem --cert=/var/vcap/data/etcd/cert.pem --endpoints=$url put foo bar
-    etcdctl --cacert=/var/vcap/jobs/tests/data/etcd-tls/tls/cert.pem --key=/var/vcap/data/etcd/key.pem --cert=/var/vcap/data/etcd/cert.pem --endpoints=$url put pokemon psyduck
-    etcdctl --cacert=/var/vcap/jobs/tests/data/etcd-tls/tls/cert.pem --key=/var/vcap/data/etcd/key.pem --cert=/var/vcap/data/etcd/cert.pem --endpoints=$url put avengers endgame
+    etcdctl --cacert=/var/vcap/jobs/tests/data/etcd-tls/tls/cert.pem --key=/var/vcap/data/targets/etcd/key.pem --cert=/var/vcap/data/targets/etcd/cert.pem --endpoints=$url put foo bar
+    etcdctl --cacert=/var/vcap/jobs/tests/data/etcd-tls/tls/cert.pem --key=/var/vcap/data/targets/etcd/key.pem --cert=/var/vcap/data/targets/etcd/cert.pem --endpoints=$url put pokemon psyduck
+    etcdctl --cacert=/var/vcap/jobs/tests/data/etcd-tls/tls/cert.pem --key=/var/vcap/data/targets/etcd/key.pem --cert=/var/vcap/data/targets/etcd/cert.pem --endpoints=$url put avengers endgame
     echo
 }
 
@@ -33,8 +33,8 @@ trashVals() {
 trashValsTls() {
     local url=$1
     echo "Trashing data..."
-    etcdctl --cacert=/var/vcap/jobs/tests/data/etcd-tls/tls/cert.pem --key=/var/vcap/data/etcd/key.pem --cert=/var/vcap/data/etcd/cert.pem --endpoints=$url put pokemon ditto
-    etcdctl --cacert=/var/vcap/jobs/tests/data/etcd-tls/tls/cert.pem --key=/var/vcap/data/etcd/key.pem --cert=/var/vcap/data/etcd/cert.pem --endpoints=$url del foo
+    etcdctl --cacert=/var/vcap/jobs/tests/data/etcd-tls/tls/cert.pem --key=/var/vcap/data/targets/etcd/key.pem --cert=/var/vcap/data/targets/etcd/cert.pem --endpoints=$url put pokemon ditto
+    etcdctl --cacert=/var/vcap/jobs/tests/data/etcd-tls/tls/cert.pem --key=/var/vcap/data/targets/etcd/key.pem --cert=/var/vcap/data/targets/etcd/cert.pem --endpoints=$url del foo
     echo
 }
 
@@ -63,19 +63,19 @@ verifyVals() {
 #Getting values from keys for etcd-tls
 verifyValsTls() {
     local url=$1
-    if [[ $(etcdctl --cacert=/var/vcap/jobs/tests/data/etcd-tls/tls/cert.pem --key=/var/vcap/data/etcd/key.pem --cert=/var/vcap/data/etcd/cert.pem --endpoints=$url get foo --print-value-only) != "bar" ]]; then
+    if [[ $(etcdctl --cacert=/var/vcap/jobs/tests/data/etcd-tls/tls/cert.pem --key=/var/vcap/data/targets/etcd/key.pem --cert=/var/vcap/data/targets/etcd/cert.pem --endpoints=$url get foo --print-value-only) != "bar" ]]; then
         echo "!! foo key was not initialized properly"
     else
         echo "Got correct value for key foo"
     fi
 
-    if [[ $(etcdctl --cacert=/var/vcap/jobs/tests/data/etcd-tls/tls/cert.pem --key=/var/vcap/data/etcd/key.pem --cert=/var/vcap/data/etcd/cert.pem --endpoints=$url get pokemon --print-value-only) != "psyduck" ]]; then
+    if [[ $(etcdctl --cacert=/var/vcap/jobs/tests/data/etcd-tls/tls/cert.pem --key=/var/vcap/data/targets/etcd/key.pem --cert=/var/vcap/data/targets/etcd/cert.pem --endpoints=$url get pokemon --print-value-only) != "psyduck" ]]; then
         echo "!! pokemon key was not initialized properly"
     else
         echo "Got correct value for key pokemon"
     fi
 
-    if [[ $(etcdctl --cacert=/var/vcap/jobs/tests/data/etcd-tls/tls/cert.pem --key=/var/vcap/data/etcd/key.pem --cert=/var/vcap/data/etcd/cert.pem --endpoints=$url get avengers --print-value-only) != "endgame" ]]; then
+    if [[ $(etcdctl --cacert=/var/vcap/jobs/tests/data/etcd-tls/tls/cert.pem --key=/var/vcap/data/targets/etcd/key.pem --cert=/var/vcap/data/targets/etcd/cert.pem --endpoints=$url get avengers --print-value-only) != "endgame" ]]; then
         echo "!! avengers key was not initialized properly"
     else
         echo "Got correct value for key avengers"
@@ -123,6 +123,9 @@ runTests() {
     echo -e ">> Verifying test data\n"
     if [ "$target" == "etcd-notls" ]; then
         verifyVals $url
+        etcdctl --endpoints=$url --user root:tests auth disable
+        etcdctl --endpoints=$url user revoke-role root root
+        etcdctl --endpoints=$url user delete root
     else
         verifyValsTls $url
     fi
@@ -164,7 +167,7 @@ tenants:
           pass:                     tests
         jobs:
           - name:    etcd-notls-daily
-            when:    daily 5am
+            when:    daily 1am
             retain:  2d
             storage: s3
             paused:  yes
@@ -177,11 +180,11 @@ tenants:
           overwrite:                true
           auth:						true
           caCertPath:				/var/vcap/jobs/targets/config/etcd/tls/cert.pem
-          clientCertPath:			/var/vcap/data/etcd/cert.pem
-          clientKeyPath:			/var/vcap/data/etcd/key.pem
+          clientCertPath:			/var/vcap/data/targets/etcd/cert.pem
+          clientKeyPath:			/var/vcap/data/targets/etcd/key.pem
         jobs:
           - name:    etcd-tls-daily
-            when:    daily 5am
+            when:    daily 1am
             retain:  2d
             storage: s3
             paused:  yes
