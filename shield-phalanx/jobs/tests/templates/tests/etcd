@@ -1,32 +1,81 @@
 #!/bin/bash
 source /var/vcap/jobs/tests/lib/functions etcd
 
-#Adding keys and values
+#Adding keys and values for etcd with user auth
 addKeyVals() {
     local url=$1
     echo "Putting three keys..."
-    ./etcdctl --cacert=/var/vcap/jobs/tests/data/etcd-tls/tls/cert.pem --key=/var/vcap/data/etcd/key.pem --cert=/var/vcap/data/etcd/cert.pem --endpoints=$url put foo bar
-    ./etcdctl --cacert=/var/vcap/jobs/tests/data/etcd-tls/tls/cert.pem --key=/var/vcap/data/etcd/key.pem --cert=/var/vcap/data/etcd/cert.pem --endpoints=$url put pokemon psyduck
-    ./etcdctl --cacert=/var/vcap/jobs/tests/data/etcd-tls/tls/cert.pem --key=/var/vcap/data/etcd/key.pem --cert=/var/vcap/data/etcd/cert.pem --endpoints=$url put avengers endgame
+    etcdctl --user root:tests --endpoints=$url put foo bar
+    etcdctl --user root:tests --endpoints=$url put pokemon psyduck
+    etcdctl --user root:tests --endpoints=$url put avengers endgame
+}
+
+#Adding keys and values for etcd-tls
+addKeyValsTls() {
+    local url=$1
+    echo "Putting three keys..."
+    etcdctl --cacert=/var/vcap/jobs/tests/data/etcd-tls/tls/cert.pem --key=/var/vcap/data/etcd/key.pem --cert=/var/vcap/data/etcd/cert.pem --endpoints=$url put foo bar
+    etcdctl --cacert=/var/vcap/jobs/tests/data/etcd-tls/tls/cert.pem --key=/var/vcap/data/etcd/key.pem --cert=/var/vcap/data/etcd/cert.pem --endpoints=$url put pokemon psyduck
+    etcdctl --cacert=/var/vcap/jobs/tests/data/etcd-tls/tls/cert.pem --key=/var/vcap/data/etcd/key.pem --cert=/var/vcap/data/etcd/cert.pem --endpoints=$url put avengers endgame
     echo
 }
 
-#Getting values from keys
+#Trashing data for etcd with user auth
+trashVals() {
+    local url=$1
+    echo "Trashing data..."
+    etcdctl --user root:tests --endpoints=$url put pokemon ditto
+    etcdctl --user root:tests --endpoints=$url del foo
+    echo
+}
+
+#Trasing data for etcd-tls
+trashValsTls() {
+    local url=$1
+    echo "Trashing data..."
+    etcdctl --cacert=/var/vcap/jobs/tests/data/etcd-tls/tls/cert.pem --key=/var/vcap/data/etcd/key.pem --cert=/var/vcap/data/etcd/cert.pem --endpoints=$url put pokemon ditto
+    etcdctl --cacert=/var/vcap/jobs/tests/data/etcd-tls/tls/cert.pem --key=/var/vcap/data/etcd/key.pem --cert=/var/vcap/data/etcd/cert.pem --endpoints=$url del foo
+    echo
+}
+
+#Getting values from keys for etcd with auth
 verifyVals() {
     local url=$1
-    if [[ $(./etcdctl --cacert=/var/vcap/jobs/tests/data/etcd-tls/tls/cert.pem --key=/var/vcap/data/etcd/key.pem --cert=/var/vcap/data/etcd/cert.pem --endpoints=$url get foo --print-value-only) != "bar" ]]; then
+    if [[ $(etcdctl --user root:tests --endpoints=$url get foo --print-value-only) != "bar" ]]; then
         echo "!! foo key was not initialized properly"
     else
         echo "Got correct value for key foo"
     fi
 
-    if [[ $(./etcdctl --cacert=/var/vcap/jobs/tests/data/etcd-tls/tls/cert.pem --key=/var/vcap/data/etcd/key.pem --cert=/var/vcap/data/etcd/cert.pem --endpoints=$url get pokemon --print-value-only) != "psyduck" ]]; then
+    if [[ $(etcdctl --user root:tests --endpoints=$url get pokemon --print-value-only) != "psyduck" ]]; then
         echo "!! pokemon key was not initialized properly"
     else
         echo "Got correct value for key pokemon"
     fi
 
-    if [[ $(./etcdctl --cacert=/var/vcap/jobs/tests/data/etcd-tls/tls/cert.pem --key=/var/vcap/data/etcd/key.pem --cert=/var/vcap/data/etcd/cert.pem --endpoints=$url get avengers --print-value-only) != "endgame" ]]; then
+    if [[ $(etcdctl --user root:tests --endpoints=$url get avengers --print-value-only) != "endgame" ]]; then
+        echo "!! avengers key was not initialized properly"
+    else
+        echo "Got correct value for key avengers"
+    fi
+}
+
+#Getting values from keys for etcd-tls
+verifyValsTls() {
+    local url=$1
+    if [[ $(etcdctl --cacert=/var/vcap/jobs/tests/data/etcd-tls/tls/cert.pem --key=/var/vcap/data/etcd/key.pem --cert=/var/vcap/data/etcd/cert.pem --endpoints=$url get foo --print-value-only) != "bar" ]]; then
+        echo "!! foo key was not initialized properly"
+    else
+        echo "Got correct value for key foo"
+    fi
+
+    if [[ $(etcdctl --cacert=/var/vcap/jobs/tests/data/etcd-tls/tls/cert.pem --key=/var/vcap/data/etcd/key.pem --cert=/var/vcap/data/etcd/cert.pem --endpoints=$url get pokemon --print-value-only) != "psyduck" ]]; then
+        echo "!! pokemon key was not initialized properly"
+    else
+        echo "Got correct value for key pokemon"
+    fi
+
+    if [[ $(etcdctl --cacert=/var/vcap/jobs/tests/data/etcd-tls/tls/cert.pem --key=/var/vcap/data/etcd/key.pem --cert=/var/vcap/data/etcd/cert.pem --endpoints=$url get avengers --print-value-only) != "endgame" ]]; then
         echo "!! avengers key was not initialized properly"
     else
         echo "Got correct value for key avengers"
@@ -38,19 +87,30 @@ runTests() {
     local url=$2
     local rc=0
 
-    cd /var/vcap/packages/etcd/bin/
+    export PATH=$PATH:/var/vcap/packages/etcd/bin/
     export ETCDCTL_API=3
 
-    echo -e "Setting up test data\n"
-    addKeyVals $url
+    echo -e ">> Setting up test data\n"
+    if [ "$target" == "etcd-notls" ]; then
+        etcdctl --endpoints=$url user add root:tests
+        etcdctl --endpoints=$url user grant-role root root
+        etcdctl --endpoints=$url auth enable
+        addKeyVals $url
+    else
+        addKeyValsTls $url
+    fi
 
     echo ">> running backup job"
     wait_for_task $(shield run-job ${target}-daily | jq -r '.task_uuid')
     echo
 
-    echo ">> trashing the data"
-    ./etcdctl --cacert=/var/vcap/jobs/tests/data/etcd-tls/tls/cert.pem --key=/var/vcap/data/etcd/key.pem --cert=/var/vcap/data/etcd/cert.pem --endpoints=$url put pokemon ditto
-    ./etcdctl --cacert=/var/vcap/jobs/tests/data/etcd-tls/tls/cert.pem --key=/var/vcap/data/etcd/key.pem --cert=/var/vcap/data/etcd/cert.pem --endpoints=$url del foo
+    echo -e ">> Messing up data\n"
+    if [ "$target" == "etcd-notls" ]; then
+        trashVals $url
+    else
+        trashValsTls $url
+    fi
+    echo
 
     if ! check_encryption ${target}; then
         rc=1
@@ -60,8 +120,12 @@ runTests() {
     wait_for_task $(restore_latest ${target})
     echo
 
-    echo "Verifying test data"
-    verifyVals $url
+    echo -e ">> Verifying test data\n"
+    if [ "$target" == "etcd-notls" ]; then
+        verifyVals $url
+    else
+        verifyValsTls $url
+    fi
     return $rc;
 }
 
@@ -95,6 +159,9 @@ tenants:
         config:
           endpoints:                http://$TARGET:2379
           overwrite:                true
+          auth:						true
+          user:                     root
+          pass:                     tests
         jobs:
           - name:    etcd-notls-daily
             when:    daily 5am
