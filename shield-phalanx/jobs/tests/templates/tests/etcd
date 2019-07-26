@@ -26,6 +26,7 @@ trashVals() {
     echo "Trashing data..."
     etcdctl --user root:tests --endpoints=$url put pokemon ditto
     etcdctl --user root:tests --endpoints=$url del foo
+    etcdctl --user root:tests --endpoints=$url put extraKey shouldNotExist
     echo
 }
 
@@ -35,51 +36,113 @@ trashValsTls() {
     echo "Trashing data..."
     etcdctl --cacert=/var/vcap/jobs/tests/data/etcd-tls/tls/cert.pem --key=/var/vcap/data/targets/etcd/key.pem --cert=/var/vcap/data/targets/etcd/cert.pem --endpoints=$url put pokemon ditto
     etcdctl --cacert=/var/vcap/jobs/tests/data/etcd-tls/tls/cert.pem --key=/var/vcap/data/targets/etcd/key.pem --cert=/var/vcap/data/targets/etcd/cert.pem --endpoints=$url del foo
+    etcdctl --cacert=/var/vcap/jobs/tests/data/etcd-tls/tls/cert.pem --key=/var/vcap/data/targets/etcd/key.pem --cert=/var/vcap/data/targets/etcd/cert.pem --endpoints=$url put extraKey shouldNotExist
     echo
 }
 
 #Getting values from keys for etcd with auth
 verifyVals() {
     local url=$1
+    local rc=0
     if [[ $(etcdctl --user root:tests --endpoints=$url get foo --print-value-only) != "bar" ]]; then
         echo "!! foo key was not initialized properly"
+        rc=1
     else
         echo "Got correct value for key foo"
     fi
 
     if [[ $(etcdctl --user root:tests --endpoints=$url get pokemon --print-value-only) != "psyduck" ]]; then
         echo "!! pokemon key was not initialized properly"
+        rc=1
     else
         echo "Got correct value for key pokemon"
     fi
 
     if [[ $(etcdctl --user root:tests --endpoints=$url get avengers --print-value-only) != "endgame" ]]; then
         echo "!! avengers key was not initialized properly"
+        rc=1
     else
         echo "Got correct value for key avengers"
     fi
+
+    if [[ $(etcdctl --user root:tests --endpoints=$url get extraKey --print-value-only) != "" ]]; then
+        etcdctl --user root:tests --endpoints=$url get extraKey --print-value-only
+        echo "!! Overwrite did not work correctly"
+        rc=1
+    else
+        echo "Overwrite works. extraKey doesn't exist"
+    fi
+
+    echo
+    return $rc
 }
 
 #Getting values from keys for etcd-tls
 verifyValsTls() {
     local url=$1
+    local rc=0
     if [[ $(etcdctl --cacert=/var/vcap/jobs/tests/data/etcd-tls/tls/cert.pem --key=/var/vcap/data/targets/etcd/key.pem --cert=/var/vcap/data/targets/etcd/cert.pem --endpoints=$url get foo --print-value-only) != "bar" ]]; then
         echo "!! foo key was not initialized properly"
+        rc=1
     else
         echo "Got correct value for key foo"
     fi
 
     if [[ $(etcdctl --cacert=/var/vcap/jobs/tests/data/etcd-tls/tls/cert.pem --key=/var/vcap/data/targets/etcd/key.pem --cert=/var/vcap/data/targets/etcd/cert.pem --endpoints=$url get pokemon --print-value-only) != "psyduck" ]]; then
         echo "!! pokemon key was not initialized properly"
+        rc=1
     else
         echo "Got correct value for key pokemon"
     fi
 
     if [[ $(etcdctl --cacert=/var/vcap/jobs/tests/data/etcd-tls/tls/cert.pem --key=/var/vcap/data/targets/etcd/key.pem --cert=/var/vcap/data/targets/etcd/cert.pem --endpoints=$url get avengers --print-value-only) != "endgame" ]]; then
         echo "!! avengers key was not initialized properly"
+        rc=1
     else
         echo "Got correct value for key avengers"
     fi
+
+    if [[ $(etcdctl --cacert=/var/vcap/jobs/tests/data/etcd-tls/tls/cert.pem --key=/var/vcap/data/targets/etcd/key.pem --cert=/var/vcap/data/targets/etcd/cert.pem --endpoints=$url get extraKey --print-value-only) != "" ]]; then
+        echo "!! Overwrite did not work correctly"
+        rc=1
+    else
+        echo "Overwrite works. extraKey doesn't exist"
+    fi
+
+    echo
+    return $rc
+}
+
+#Prints all keys and values
+dumpKeys() {
+    local url=$1
+    echo "Printing all keys and values"
+    etcdctl --endpoints=$url --user root:tests get "" --prefix=true
+    echo
+}
+
+#Prints all keys and values for etcd-tls
+dumpKeysTls() {
+    local url=$1
+    echo "Printing all keys and values"
+    etcdctl --cacert=/var/vcap/jobs/tests/data/etcd-tls/tls/cert.pem --key=/var/vcap/data/targets/etcd/key.pem --cert=/var/vcap/data/targets/etcd/cert.pem --endpoints=$url get "" --prefix=true
+    echo
+}
+
+#Deletes all keys/values
+deleteVals() {
+    local url=$1
+    echo "Deleting keys and values"
+    etcdctl --endpoints=$url del "" --prefix=true
+    echo
+}
+
+#Deletes all keys/values for etcd-tls
+deleteValsTls() {
+    local url=$1
+    echo "Deleting keys and values"
+    etcdctl --cacert=/var/vcap/jobs/tests/data/etcd-tls/tls/cert.pem --key=/var/vcap/data/targets/etcd/key.pem --cert=/var/vcap/data/targets/etcd/cert.pem --endpoints=$url del "" --prefix=true
+    echo
 }
 
 runTests() {
@@ -92,12 +155,16 @@ runTests() {
 
     echo -e ">> Setting up test data\n"
     if [ "$target" == "etcd-notls" ]; then
+        deleteVals $url
         etcdctl --endpoints=$url user add root:tests
         etcdctl --endpoints=$url user grant-role root root
         etcdctl --endpoints=$url auth enable
         addKeyVals $url
+        dumpKeys $url
     else
+        deleteValsTls $url
         addKeyValsTls $url
+        dumpKeysTls $url
     fi
 
     echo ">> running backup job"
@@ -107,8 +174,10 @@ runTests() {
     echo -e ">> Messing up data\n"
     if [ "$target" == "etcd-notls" ]; then
         trashVals $url
+        dumpKeys $url
     else
         trashValsTls $url
+        dumpKeysTls $url
     fi
     echo
 
@@ -123,12 +192,19 @@ runTests() {
     echo -e ">> Verifying test data\n"
     if [ "$target" == "etcd-notls" ]; then
         verifyVals $url
+        rc=$?
+        dumpKeys $url
         etcdctl --endpoints=$url --user root:tests auth disable
         etcdctl --endpoints=$url user revoke-role root root
         etcdctl --endpoints=$url user delete root
+        deleteVals $url
     else
         verifyValsTls $url
+        dumpKeysTls $url
+        rc=$?
+        deleteValsTls $url
     fi
+
     return $rc;
 }
 
@@ -161,7 +237,7 @@ tenants:
         agent:  $TARGET:5444
         config:
           endpoints:                http://$TARGET:2379
-          overwrite:                true
+          fullOverwrite:            true
           auth:						true
           user:                     root
           pass:                     tests
@@ -177,7 +253,7 @@ tenants:
         agent:  $TARGET:5444
         config:
           endpoints:                https://$TARGET:2479
-          overwrite:                true
+          fullOverwrite:            true
           auth:						true
           caCertPath:				/var/vcap/jobs/targets/config/etcd/tls/cert.pem
           clientCertPath:			/var/vcap/data/targets/etcd/cert.pem

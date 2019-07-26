@@ -14,7 +14,6 @@ export PATH=$PATH:/var/vcap/packages/cfssl/bin
 echo "[$(date)] $BIN/$$: regenerating certificates..."
 rm -rf $TMP_DIR
 mkdir -p $CERTS_DIR $TMP_DIR
-apt install acl
 pushd $TMP_DIR 2>/dev/null 2>&1
 
 echo "[$(date)] $BIN/$$: configuring ca parameters"
@@ -50,7 +49,8 @@ gencert() {
   }
 }
 EOF
-  cfssl gencert \
+  chpst -u vcap:vcap \
+    cfssl gencert \
     -ca=$JOB_DIR/tls/cert.pem \
     -ca-key=$JOB_DIR/tls/key.pem \
     -config=ca.json \
@@ -64,8 +64,8 @@ EOF
   echo ">> $CERTS_DIR/$dest/cert.pem"
   openssl x509 -text -in $CERTS_DIR/$dest/cert.pem
   echo
-  setfacl -m u:vcap:rwx $CERTS_DIR/$dest/cert.pem
-  setfacl -m u:vcap:rwx $CERTS_DIR/$dest/key.pem
+  chown -R vcap:vcap $CERTS_DIR/$dest/cert.pem
+  chown -R vcap:vcap $CERTS_DIR/$dest/key.pem
 }
 
 echo "[$(date)] $BIN/$$: issuing the etcd server certificate for etcd"

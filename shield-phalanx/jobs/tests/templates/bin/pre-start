@@ -14,7 +14,6 @@ export PATH=$PATH:/var/vcap/packages/cfssl/bin
 echo "[$(date)] $BIN/$$: regenerating certificates..."
 rm -rf $TMP_DIR
 mkdir -p $CERTS_DIR $TMP_DIR
-chown -R vcap:vcap $CERTS_DIR
 pushd $TMP_DIR 2>/dev/null 2>&1
 
 echo "[$(date)] $BIN/$$: configuring ca parameters"
@@ -50,7 +49,8 @@ gencert() {
   }
 }
 EOF
-  cfssl gencert \
+  chpst -u vcap:vcap \
+    cfssl gencert \
     -ca=$JOB_DIR/tls/cert.pem \
     -ca-key=$JOB_DIR/tls/key.pem \
     -config=ca.json \
