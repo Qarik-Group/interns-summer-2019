@@ -1,4 +1,4 @@
-##Introducing SHIELD etcd plugin
+## Introducing SHIELD etcd plugin
 
 We spent the summer over at Stark&Wayne to design and build the etcd plugin for SHIELD. The basic functionalities include backing up data from etcd and then restoring this data to etcd using the backup archives. This blog post will explain all the nitty gritty details about the functionalities that the new target plugin supports.
 
@@ -9,11 +9,11 @@ Kubernetes lives on top of etcd. Etcd’s job within Kubernetes is to safely sto
 As a part of this project's requirement, we validated both etcd and SHIELD. Like all other SHIELD plugins, this plugin is also written in Go.
 
 
-##How does the plugin work?
+## How does the plugin work?
 
 Backups and restores are the backbone of the SHIELD contract. The etcd plugin works along the same principles that govern the SHIELD realm. We have extensivley leveraged the `etcd/clientv3` for writing the plugin; which is the official Go etcd client for v3. The etcd plugin supports both single node and multi node setups. 
 
-###Authentication
+### Authentication
 
 etcd plugin supports:
 
@@ -22,7 +22,7 @@ etcd plugin supports:
 3. Certificate based auth
 4. Role based auth coupled with cert based auth
 
-###Fields
+### Fields
 
 This is the defacto information that you need to provide any plugin in order to backup/restore. etcd plugin needs the following information:
 
@@ -37,19 +37,19 @@ This is the defacto information that you need to provide any plugin in order to 
 9. Overwrite mode: This mode enables deletion of exisiting state of the etcd cluster. Restores the cluster with an earlier sane backup. Super helpful in case of corrupted keys/values.
 10. Prefixed backup: You can specify a directory/key_name structure to backup only certain keys with the same prefix.
 
-###Validation
+### Validation
 
 etcd plugin duly validates all the fields that the User/Operator provides after the connection to the etcd installation is established. Checks all the dependencies and moves to backup the cluster once everything gets verified.
 
-###Backup
+### Backup
 
 After validation, etcd plugin moves forward to backup the installation and dumps the keys and respective values to a store plugin of your choice (SHIELD supported storage plugins). You can configure your backups to be periodic/automated as well. 
 
-###Restore
+### Restore
 
 Once the backup job is run, you can use the etcd plugin to retrieve the backups and use them to restore your installations. SHEILD will pull in the archives from the storage and restore them.
 
-###Error Handling
+### Error Handling
 
 etcd plugin returns following types of errors:
 
@@ -60,7 +60,7 @@ etcd plugin returns following types of errors:
 
 
 
-##How to try out the etcd plugin?
+## How to try out the etcd plugin?
 
 If you have an etcd installation (single node/multi-node) setup somewhere, we highly suggest getting the latest SHIELD release (v8.4.0) to test out the shiny new plugin. You can do that using a bunch of options:
 
