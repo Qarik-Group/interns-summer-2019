@@ -19,18 +19,18 @@ Backups and restores are the backbone of the SHIELD contract. The etcd plugin wo
 
 etcd plugin supports:
 
-1. Anonymous auth(no auth)
-2. Role-based auth (Username/password)
-3. Certificate based auth
-4. Role based auth coupled with cert based auth
+1. Anonymous authentication(no authentication)
+2. Role-based authentication (Username/password)
+3. Certificate-based authentication
+4. Role based authentication coupled with cert based auth
 
 ### Fields
 
-This is the defacto information that you need to provide any plugin in order to backup/restore. etcd plugin needs the following information:
+This is the defacto information that you need to provide any plugin in order to backup/restore. Etcd plugin needs the following information:
 
 1. Endpoints/etcd URLs: IP addresses/DNS names of your etcd installation
 2. Timeout: Defaults to 2 seconds. 
-3. Auth type: No auth, RBAC, cert based
+3. authentication type: No authentication, Role-based authentication, Certificate-based authentication
 4. Username
 5. Password
 6. Client certificate (User/Operator needs to copy paste the contents of the PEM file)
@@ -41,7 +41,7 @@ This is the defacto information that you need to provide any plugin in order to 
 
 ### Validation
 
-etcd plugin duly validates all the fields that the User/Operator provides after the connection to the etcd installation is established. Checks all the dependencies and moves to backup the cluster once everything gets verified.
+Etcd plugin duly validates all the fields that the User/Operator provides after the connection to the etcd installation is established. Checks all the dependencies and moves to backup the cluster once everything gets verified.
 
 ### Backup
 
@@ -58,8 +58,6 @@ etcd plugin returns following types of errors:
 1. context error: canceled or deadline exceeded.
 2. Keys/values decoding errors.
 3. etcd cluster/installation's invalid configuration errors.
-
-
 
 
 ## How to try out the etcd plugin?
