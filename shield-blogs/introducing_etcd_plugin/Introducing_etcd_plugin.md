@@ -68,5 +68,5 @@ If you have an etcd installation (single node/multi-node) setup somewhere, we hi
 2. `go get github.com/shieldproject/shield`. Just make sure your GOPATH is set correctly. This can be a huge pain otherwise. 
 3. Docker compose recipe for this release will be soon available. Details will be updated here.
 
-We hope that you'll have fun experimenting with the etcd plugin. Let us know how this goes. 
+We hope that you'll have fun experimenting with the etcd plugin. Let us know how this goes via [https://shieldproject.io/community/](). 
 
