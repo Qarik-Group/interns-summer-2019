@@ -1,0 +1,19 @@
+## Our Internship experience at Stark&Wayne
+
+#### By: Jason Zhou, Pururva Lakkad, Naveed Ahmad, Sriniketh Varma Dasarraju
+
+Over the summer, we had the incredible privilege of interning at Stark&Wayne. S&W is the premier BOSH, Cloud Foundry, and Cloud Native consulting firm. To be honest, these terms didn't make a lot of sense when we first started three months ago. 
+
+Onboarding was fun. We had a 2 hours long meeting with James, Tyler and Michael singer. All of us were handed shiny MacBook Airs for the course of the internship. From the very beginning, we realized everyone working at Stark&Wayne was smart as hell. The environment was very friendly towards us, because that's how it is here. People are pretty chill and you can talk to anyone about anything. You can desribe it as "fun and productive"
+
+We spent the first couple of weeks in an awestruck stupor. There was a choice of choosing one project out of four for the course of this internship. After spending a couple of days researching, we decided to write the etcd plugin for SHIELD. Once this was locked, we were given like a week or two to explore bits and pieces of the project. During this time, we were clueless, confused and overwhelmed with all of the jargon. Go, Docker, Kubernetes, etcd, SHIELD, cloud native.....all of this sort of went over our heads. Finally, after a couple of weeks experimenting with a lot of stuff, things started to kick in. 
+
+This was the time when we started using Trello boards for sprint planning. Alex and Pat helped us with setting up cards and boards. It was super useful. Confused interns finally had a shot at productive, smaller, definite tasks. A sprint used to run for a week. The daily standups really helped us a lot. We would throw all kinds of dumb stuff around James and Pat and they would walk us through them, multiple times without batting an eye. Friday used to be the Demo day. It is a real joy to move cards across the boards to "Done" every Friday.
+
+Everyday was a learning opportunity. We could walk into the Fishbowl anytime and talk to Pat, Dave, Alex and Tom for a dumb problem and they used to explain us how to get around that. We learnt a lot in that process. At times, we would have to google all the terms these guys used, which was a learning experience in itself. 
+
+We wrote the etcd plugin with a base skeleton in a matter of a few weeks. After a lot of debugging, big fixing and feature addition, we were introduced to SHIELD Phalanx: a bespoke BOSH release for testing the full-stack functionality of Stark & Wayne's SHIELD backup solution. We had to write tests and add configs for the etcd plugin. This process took a good 2-3 weeks. Code reviews also provided a lof of insight. Our code would break very often and this gave us a chance to write a lot of tests making sure the code was good. Bad code is a torture to the soul. In last few weeks, we were exposed to the CI/CD pipelines as well. As promised, this internship introuduced us to the realities of dev/ops culture, agile methodologies, and cloud technology.
+
+Talking of now, we can surely brag about a lot of stuff that we learnt here. But humility is the true key to success. Learn to keep your head down and learn as much as you can. People working at Stark&Wayne have mastered the art of being helpful, which makes them so great at whatever they do. 
+
+Stark&Wayne is still fielding applications for Fall 2019 and Spring 2020. If you care about open source and want to learn on a daily basis, go ahead and apply. You can do that by emailing a copy of your résumé, and sending over a paragraph or two about why you want to join, to internships@starkandwayne.com.
