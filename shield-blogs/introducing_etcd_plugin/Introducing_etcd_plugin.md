@@ -1,5 +1,7 @@
 ## Introducing SHIELD etcd plugin
 
+#### By:  Jason Zhou, Pururva Lakkad, Naveed Ahmad, Sriniketh Varma Dasarraju
+
 We spent the summer over at Stark&Wayne to design and build the etcd plugin for SHIELD. The basic functionalities include backing up data from etcd and then restoring this data to etcd using the backup archives. This blog post will explain all the nitty gritty details about the functionalities that the new target plugin supports.
 
 Etcd is an open-source distributed key-value store that serves as the backbone of distributed systems by providing a canonical hub for cluster coordination and state management – the systems source of truth. While etcd was built specifically for clusters running CoreOS, etcd works on a variety of operating systems including OS X, Linux, and BSD.
